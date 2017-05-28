@@ -1,5 +1,6 @@
-import discord
+# import discord
 from discord.ext import commands
+
 
 description = """It's gonna be kewl soon"""
 
@@ -9,11 +10,6 @@ bot = commands.Bot(command_prefix='?', description=description)
 @bot.event
 async def on_ready():
     print("Logged in")
-
-
-@bot.command()
-async def test():
-    await bot.say("GG")
 
 
 @bot.command(pass_context=True)
