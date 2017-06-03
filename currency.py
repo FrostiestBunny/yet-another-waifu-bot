@@ -5,6 +5,7 @@ from GG import gg_manager as ggs
 
 @bot.command(pass_context=True)
 async def update_ggs(ctx):
+    """Super secret bot owner only command."""
     if ctx.message.author.id != '178887072864665600':
         await bot.say("You're not kewl enough.")
         return
@@ -17,15 +18,19 @@ async def update_ggs(ctx):
 
 @bot.command(pass_context=True)
 async def balance(ctx, member: discord.Member=None):
+    """Check your money, yo."""
     if not member:
         member = ctx.message.author
 
     gg_balance = ggs.get_ggs(member.id)
-    await bot.say("{}'s balance: {} GGs".format(member.name, gg_balance))
+    embed = discord.Embed()
+    embed.add_field(name="{}'s balance".format(member.name), value=gg_balance)
+    await bot.say(embed=embed)
 
 
 @bot.command(pass_context=True)
 async def cheat(ctx, num: int, member: discord.Member):
+    """You saw nothing."""
     if ctx.message.author.id != '178887072864665600':
         await bot.say("You're not kewl enough.")
         return

@@ -13,7 +13,9 @@ class GGManager:
             json.dump(self.ggs_data, f)
 
     def add_user(self, _id, name):
-        self.ggs_data[str(_id)] = {'name': name, 'ggs': 0}
+        if str(_id) in self.ggs_data:
+            return
+        self.ggs_data[str(_id)] = {'name': name, 'ggs': 10}
         self.save()
 
     def get_ggs(self, _id):
@@ -28,6 +30,9 @@ class GGManager:
         n = abs(n)
         self.ggs_data[str(_id)]['ggs'] -= n
         self.save()
+
+    def entry_exists(self, _id):
+        return self.ggs_data.get(_id, default=False)
 
 
 gg_manager = GGManager()
