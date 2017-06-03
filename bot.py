@@ -16,12 +16,12 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    await bot.process_commands(message)
     if message.content == '\o':
         await bot.send_message(message.channel, 'o/')
-    if random.randint(0, 99) < 10:
+    if random.randint(0, 99) < 5:
         author = message.author
-        ggs.add(author.id, 15)
-    await bot.process_commands(message)
+        ggs.add(author.id, 10)
 
 
 @bot.command(pass_context=True)

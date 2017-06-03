@@ -25,7 +25,7 @@ async def transfer(ctx, member: discord.Member, num: int):
 @bot.command(pass_context=True)
 async def balance(ctx, member: discord.Member=None):
     """Check your money, yo."""
-    if not member:
+    if member is None:
         member = ctx.message.author
 
     gg_balance = ggs.get_ggs(member.id)
