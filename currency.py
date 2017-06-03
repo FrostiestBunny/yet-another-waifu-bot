@@ -9,6 +9,14 @@ async def on_server_join(server):
             ggs.add_user(member.id, member.name)
 
 
+@bot.command()
+async def update_db_cause_zack_sucks():
+    for server in bot.servers:
+        for member in server.members:
+            ggs.add_user(member.id, member.name)
+    await bot.say("Successfully updated the database. Git gud Zack, seriously.")
+
+
 @bot.command(pass_context=True)
 async def transfer(ctx, member: discord.Member, num: int):
     """Transfer GGs to other users."""
