@@ -10,6 +10,19 @@ async def on_server_join(server):
 
 
 @bot.command(pass_context=True)
+async def transfer(ctx, member: discord.Member, num: int):
+    """Transfer GGs to other users."""
+    sender = ctx.message.author
+    sender_ggs = ggs.get_ggs(sender.id)
+    if sender_ggs < num:
+        await bot.say("You don't even have that much, scrub.")
+        return
+    ggs.add(member.id, num)
+    ggs.sub(sender.id, num)
+    await bot.say("Successfully transferred {} GGs to {}.".format(num, member.name))
+
+
+@bot.command(pass_context=True)
 async def balance(ctx, member: discord.Member=None):
     """Check your money, yo."""
     if not member:
@@ -17,7 +30,7 @@ async def balance(ctx, member: discord.Member=None):
 
     gg_balance = ggs.get_ggs(member.id)
     embed = discord.Embed()
-    embed.add_field(name="{}'s balance".format(member.name), value=gg_balance)
+    embed.add_field(name="{}'s balance".format(member.name), value=str(gg_balance)+" GGs.")
     await bot.say(embed=embed)
 
 

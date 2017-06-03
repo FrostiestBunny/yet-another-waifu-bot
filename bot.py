@@ -1,5 +1,7 @@
 # import discord
 from discord.ext import commands
+from GG import gg_manager as ggs
+import random
 
 
 description = """It's gonna be kewl soon"""
@@ -16,6 +18,9 @@ async def on_ready():
 async def on_message(message):
     if message.content == '\o':
         await bot.send_message(message.channel, 'o/')
+    if random.randint(0, 99) < 10:
+        author = message.author
+        ggs.add(author.id, 15)
     await bot.process_commands(message)
 
 
