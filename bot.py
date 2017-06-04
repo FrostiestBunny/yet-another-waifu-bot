@@ -33,7 +33,7 @@ async def change_avatar(ctx, url: str):
     with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             avatar_b = await resp.read()
-            bot.edit_profile(avatar=avatar_b)
+            await bot.edit_profile(avatar=avatar_b)
 
 
 @bot.command(pass_context=True)
