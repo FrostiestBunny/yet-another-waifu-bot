@@ -31,6 +31,10 @@ class GGManager:
         self.ggs_data[str(_id)]['ggs'] -= n
         self.save()
 
+    def set(self, _id, n):
+        self.ggs_data[str(_id)]['ggs'] = n
+        self.save()
+
     def entry_exists(self, _id):
         return self.ggs_data.get(_id, default=False)
 

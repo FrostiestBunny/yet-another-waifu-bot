@@ -9,8 +9,11 @@ async def on_server_join(server):
             ggs.add_user(member.id, member.name)
 
 
-@bot.command()
-async def update_db_cause_zack_sucks():
+@bot.command(pass_context=True)
+async def update_db_cause_zack_sucks(ctx):
+    if ctx.message.author.id != '178887072864665600':
+        await bot.say("You're not Zack enough.")
+        return
     for server in bot.servers:
         for member in server.members:
             ggs.add_user(member.id, member.name)
@@ -18,8 +21,25 @@ async def update_db_cause_zack_sucks():
 
 
 @bot.command(pass_context=True)
+async def reset_db(ctx):
+    if ctx.message.author.id != '178887072864665600':
+        await bot.say("You're not Zack enough.")
+        return
+    for server in bot.servers:
+        for member in server.members:
+            ggs.set(member.id, 10)
+    await bot.say("Successfully updated the database. Git gud Zack, seriously.")
+
+
+@bot.command(pass_context=True)
 async def transfer(ctx, member: discord.Member, num: int):
     """Transfer GGs to other users."""
+    if member.bot:
+        await bot.say("You're a bot, mate.")
+        return
+    if num <= 0:
+        await bot.say("Haha, good one, mate.")
+        return
     sender = ctx.message.author
     sender_ggs = ggs.get_ggs(sender.id)
     if sender_ggs < num:
