@@ -31,5 +31,4 @@ async def uwot(ctx, member: discord.Member, *args):
     out.paste(av, box=(85, 360))
     result = BytesIO()
     out.save(result, format='PNG')
-    img = open(result.getvalue(), 'rb')
-    await bot.send_file(ctx.message.channel)
+    await bot.send_file(ctx.message.channel, result)
