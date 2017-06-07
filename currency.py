@@ -65,13 +65,18 @@ async def balance(ctx, member: discord.Member=None):
 @bot.command(pass_context=True)
 async def cheat(ctx, num: int, *members: discord.Member):
     """You saw nothing."""
-    if ctx.message.author.id != '178887072864665600':
-        await bot.say("You're not kewl enough.")
+    author = ctx.message.author
+    roles = map(str, author.roles)
+    if 'Bot Commander' in roles:  # or id == '178887072864665600':
+        print("Good")
+        return
+    else:
+        print("Not good")
         return
 
-    for member in members:
-        if num >= 0:
-            ggs.add(member.id, num)
-        else:
-            ggs.sub(member.id, num)
-    await bot.say("Added {} GGs.".format(num))
+    # for member in members:
+    #     if num >= 0:
+    #         ggs.add(member.id, num)
+    #     else:
+    #         ggs.sub(member.id, num)
+    # await bot.say("Added {} GGs.".format(num))
