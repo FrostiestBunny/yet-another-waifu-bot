@@ -30,5 +30,5 @@ async def uwot(ctx, member: discord.Member, *args):
     out = Image.alpha_composite(base, txt)
     out.paste(av, box=(85, 360))
     print("I got this far")
-    a = open(out, mode="rb")
+    a = open(BytesIO(out), mode="rb")
     await bot.send_file(ctx.message.channel, a)
