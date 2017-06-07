@@ -1,4 +1,5 @@
 import discord
+from io import BytesIO
 from bot import bot
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -11,7 +12,7 @@ async def uwot(ctx, member: discord.Member, *args):
         async with session.get(url) as resp:
             avatar = await resp.read()
     base = Image.open('images/uwot.png').convert('RGBA')
-    av = Image.open(avatar).convert('RGBA')
+    av = Image.open(BytesIO(avatar)).convert('RGBA')
     av = ImageOps.fit(av, (260, 260))
 
     txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
