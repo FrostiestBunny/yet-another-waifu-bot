@@ -20,8 +20,8 @@ async def on_message(message):
     await bot.process_commands(message)
     if message.content == '\o':
         await bot.send_message(message.channel, 'o/')
-    if random.randint(0, 99) < 5:
-        author = message.author
+    author = message.author
+    if random.randint(0, 99) < 5 and not author.bot:
         ggs.add(author.id, 10)
 
 

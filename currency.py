@@ -64,6 +64,7 @@ async def balance(ctx, member: discord.Member=None):
 
 @bot.command()
 async def top():
+    """Display ten richest users."""
     users = (ggs.ggs_data.keys())
     users = sorted(users, key=lambda u: ggs.get_ggs(u), reverse=True)
     users = users[:10]
