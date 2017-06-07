@@ -29,5 +29,6 @@ async def uwot(ctx, member: discord.Member, *args):
     txt = txt.rotate(-25, resample=Image.BILINEAR)
     out = Image.alpha_composite(base, txt)
     out.paste(av, box=(85, 360))
+    print("I got this far")
 
     bot.send_file(out, ctx.message.channel)
