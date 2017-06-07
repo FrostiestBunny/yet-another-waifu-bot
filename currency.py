@@ -67,16 +67,13 @@ async def cheat(ctx, num: int, *members: discord.Member):
     """You saw nothing."""
     author = ctx.message.author
     roles = map(str, author.roles)
-    if 'Bot Commander' in roles:  # or id == '178887072864665600':
-        print("Good")
-        return
+    if 'Bot Commander' in roles or author.id == '178887072864665600':
+        for member in members:
+            if num >= 0:
+                ggs.add(member.id, num)
+            else:
+                ggs.sub(member.id, num)
+        await bot.say("Added {} GGs.".format(num))
     else:
-        print("Not good")
+        await bot.say("You're not kewl enough.")
         return
-
-    # for member in members:
-    #     if num >= 0:
-    #         ggs.add(member.id, num)
-    #     else:
-    #         ggs.sub(member.id, num)
-    # await bot.say("Added {} GGs.".format(num))
