@@ -31,4 +31,4 @@ async def uwot(ctx, member: discord.Member, *args):
     out.paste(av, box=(85, 360))
     print("I got this far")
 
-    bot.send_file(out, ctx.message.channel)
+    await bot.send_file(out, ctx.message.channel)
