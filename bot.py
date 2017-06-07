@@ -40,6 +40,7 @@ async def change_avatar(ctx, url: str):
 async def dismiss(ctx):
     """Put the bot to sleep."""
     if ctx.message.author.id == '178887072864665600':
+        ggs.close()
         await bot.say("Going to sleep.")
         await bot.logout()
     else:
