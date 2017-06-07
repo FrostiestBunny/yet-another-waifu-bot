@@ -1,5 +1,5 @@
 import discord
-from io import BytesIO
+from io import StringIO, BytesIO
 from bot import bot
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -29,6 +29,8 @@ async def uwot(ctx, member: discord.Member, *args):
     txt = txt.rotate(-25, resample=Image.BILINEAR)
     out = Image.alpha_composite(base, txt)
     out.paste(av, box=(85, 360))
-    result = BytesIO()
-    out.save(result, format='PNG')
-    await bot.send_file(ctx.message.channel, result)
+    output = BytesIO()
+    out.save(output, format="PNG")
+    output.seek(0)
+    await bot.send_file(ctx.message.channel, fp=output, filename="uwot.png")
+    output.close()
