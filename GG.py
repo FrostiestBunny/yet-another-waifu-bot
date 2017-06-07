@@ -24,13 +24,13 @@ class GGManager:
         query = self.cur.fetchall()
         for row in query:
             _id, ggs, username = row
-            self.ggs_data[int(_id)] = {'name': str(username), 'ggs': int(ggs)}
+            self.ggs_data[str(_id)] = {'name': str(username), 'ggs': int(ggs)}
 
     def save(self):
         self.conn.commit()
 
     def add_user(self, _id, name):
-        _id = int(_id)
+        _id = str(_id)
         if _id in self.ggs_data:
             return
         self.ggs_data[_id] = {'name': name, 'ggs': 10}
@@ -38,11 +38,11 @@ class GGManager:
         self.save()
 
     def get_ggs(self, _id):
-        _id = int(_id)
+        _id = str(_id)
         return self.ggs_data[_id]['ggs']
 
     def add(self, _id, n):
-        _id = int(_id)
+        _id = str(_id)
         n = abs(n)
         self.ggs_data[_id]['ggs'] += n
         ggs = self.get_ggs(_id)
@@ -50,7 +50,7 @@ class GGManager:
         self.save()
 
     def sub(self, _id, n):
-        _id = int(_id)
+        _id = str(_id)
         n = abs(n)
         self.ggs_data[_id]['ggs'] -= n
         ggs = self.get_ggs(_id)
@@ -58,13 +58,13 @@ class GGManager:
         self.save()
 
     def set(self, _id, n):
-        _id = int(_id)
+        _id = str(_id)
         self.ggs_data[_id]['ggs'] = n
         self.cur.execute("UPDATE users SET ggs=%s WHERE id=%s", (n, _id))
         self.save()
 
     def entry_exists(self, _id):
-        _id = int(_id)
+        _id = str(_id)
         return self.ggs_data.get(_id, default=False)
 
     def close(self):
