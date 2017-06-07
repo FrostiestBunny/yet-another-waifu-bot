@@ -17,12 +17,13 @@ async def uwot(ctx, member: discord.Member, *args):
 
     txt = Image.new('RGBA', base.size, (255, 255, 255, 0))
 
-    fnt = ImageFont.truetype('fonts/big_noodle_titling.ttf', 17)
+    fnt = ImageFont.truetype('fonts/big_noodle_titling.ttf', 20)
     d = ImageDraw.Draw(txt)
 
     res = ""
     for a in args:
         res += a
+        res += " "
 
     d.text((455, 450), res, font=fnt, fill=(0, 0, 0, 255))
 
