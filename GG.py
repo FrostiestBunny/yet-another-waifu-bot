@@ -37,6 +37,10 @@ class GGManager:
         self.cur.execute("INSERT INTO users (id, ggs, username) VALUES (%s, %s, %s)", (_id, 10, name))
         self.save()
 
+    def get_user(self, _id):
+        _id = str(_id)
+        return self.ggs_data[_id]
+
     def get_ggs(self, _id):
         _id = str(_id)
         return self.ggs_data[_id]['ggs']

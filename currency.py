@@ -62,6 +62,20 @@ async def balance(ctx, member: discord.Member=None):
     await bot.say(embed=embed)
 
 
+@bot.command()
+async def top():
+    users = (ggs.ggs_data.keys())
+    users = sorted(users, key=lambda u: ggs.get_ggs(u))
+    users = users[:10]
+    result = ""
+    for user in users:
+        u_data = ggs.get_user(user)
+        result += "{} - {}\n".format(u_data['name'], u_data['ggs'])
+    embed = discord.Embed()
+    embed.add_field(name="Top 10", value=result)
+    await bot.say(embed=embed)
+
+
 @bot.command(pass_context=True)
 async def cheat(ctx, num: int, *members: discord.Member):
     """You saw nothing."""
