@@ -116,8 +116,7 @@ async def get_pimp(ctx, member: discord.Member):
         await bot.say("You already have a pimp.")
         return
 
-    await bot.say("{}, {} wants you to be their pimp, do you accept? Being their pimp means you get a part of their " +
-                  "earnings, but you'll have the burden of protecting them. Also you can't become a slut as a pimp."
+    await bot.say("{}, {} wants you to be their pimp, do you accept? Being their pimp means you get a part of their earnings, but you'll have the burden of protecting them. Also you can't become a slut as a pimp."
                   .format(member.mention, author.name))
     resp = await bot.wait_for_message(author=member, timeout=120)
     if resp is None:
