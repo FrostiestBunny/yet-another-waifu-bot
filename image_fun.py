@@ -1,5 +1,5 @@
 import discord
-from io import StringIO, BytesIO
+from io import BytesIO
 from bot import bot
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageOps

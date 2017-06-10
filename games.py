@@ -26,7 +26,7 @@ async def rps_challenge(ctx, member: discord.Member, bet: int):
     if ggs.get_ggs(member.id) < bet:
         await bot.say("Challenged user doesn't have enough GGs.")
         return
-    await bot.say('{}, you have been challenged to a rock paper scissors battle by {}. The bet is {} GGs.'
+    await bot.say('{}, you have been challenged to a rock paper scissors battle by {}. The bet is {} GGs. '
                   .format(member.mention, challenger.name, bet) +
                   'Do you accept? Type yes or no.')
     response = await bot.wait_for_message(timeout=120, author=member)
