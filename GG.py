@@ -69,7 +69,7 @@ class GGManager:
 
     def entry_exists(self, _id):
         _id = str(_id)
-        return self.ggs_data.get(_id, default=False)
+        return self.ggs_data.get(_id, False)
 
     def close(self):
         self.cur.close()

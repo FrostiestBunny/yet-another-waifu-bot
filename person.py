@@ -17,7 +17,7 @@ class People:
 
     def get_worker(self, ide):
         ide = str(ide)
-        return self.workers.get(ide, default=None)
+        return self.workers.get(ide, None)
 
     def remove_worker(self, ide):
         ide = str(ide)
@@ -25,7 +25,7 @@ class People:
 
     def get_pimp(self, ide):
         ide = str(ide)
-        return self.pimps.get(ide, default=None)
+        return self.pimps.get(ide, None)
 
 
 class Person:
