@@ -102,6 +102,12 @@ async def get_pimp(ctx, member: discord.Member):
     if member is None:
         await bot.say("No such member.")
         return
+    if member.id == author.id:
+        await bot.say("Can't ask yourself, m8.")
+        return
+    if member.bot:
+        await bot.say("CAN'T ASK BOTS.")
+        return
     if people.get_pimp(author.id) is not None:
         await bot.say("You're a pimp, mate, can't be a whore too.")
         return
@@ -184,7 +190,7 @@ async def slut(ctx):
             ggs.add(author.id, number - number2)
             ggs.add(pimp.ide, number2)
             member = choice(list(ctx.message.server.members))
-            while member.name == author.name:
+            while member.id == author.id:
                 member = choice(list(ctx.message.server.members))
             await bot.say("You had {} as your client and earned {} GGs in total. {} goes to you, and {} to your pimp."
                           .format(member.name, number, number - number2, number2))
