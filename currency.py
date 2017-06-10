@@ -179,14 +179,14 @@ async def slut(ctx):
 
         if pick == 1:
             number = randint(50, 350)
-            number2 = 0.3 * number
+            number2 = int(0.3 * number)
             ggs.add(author.id, number - number2)
             ggs.add(pimp.ide, number2)
             await bot.say("You had a poor client and earned {} GGs in total. {} goes to you, and {} to your pimp."
                           .format(number, number - number2, number2))
         elif pick == 2:
             number = randint(100, 500)
-            number2 = 0.3 * number
+            number2 = int(0.3 * number)
             ggs.add(author.id, number - number2)
             ggs.add(pimp.ide, number2)
             member = choice(list(ctx.message.server.members))
@@ -196,7 +196,7 @@ async def slut(ctx):
                           .format(member.name, number, number - number2, number2))
         elif pick == 3:
             number = randint(150, 650)
-            number2 = 0.3 * number
+            number2 = int(0.3 * number)
             ggs.add(author.id, number - number2)
             ggs.add(pimp.ide, number2)
             await bot.say("You had a wealthy client and earned {} GGs in total. {} goes to you, and {} to your pimp."
