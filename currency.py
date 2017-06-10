@@ -215,7 +215,7 @@ async def slut(ctx):
                           .format(pimp.mention, number))
 
     else:
-        time_left = worker.time_left()
+        time_left = worker.time_left(30 * 60)
         if time_left >= 60:
             time = time_left // 60
             await bot.say("You must wait {} minutes.".format(time))
