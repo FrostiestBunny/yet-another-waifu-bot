@@ -137,7 +137,7 @@ async def get_pimp(ctx, member: discord.Member):
             people.add_pimp(member.id, member.name)
             pimp = people.get_pimp(member.id)
         people.add_pimp_to_worker(author.id, pimp)
-        await bot.say("{} is now your pimp, {}, congratulations. You can now use the ?prostitute command."
+        await bot.say("{} is now your pimp, {}, congratulations. You can now use the ?slut command."
                       .format(member.name, author.mention))
         return
     else:
@@ -218,7 +218,7 @@ async def slut(ctx):
         time_left = worker.time_left(30 * 60)
         if time_left >= 60:
             time = time_left // 60
-            await bot.say("You must wait {} minutes.".format(time))
+            await bot.say("You must wait {} minutes.".format(int(time)))
         else:
             time = time_left
             await bot.say("You must wait {} seconds.".format(time))
