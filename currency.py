@@ -98,6 +98,7 @@ async def cheat(ctx, num: int, *members: discord.Member):
 
 @bot.command(pass_context=True)
 async def get_pimp(ctx, member: discord.Member):
+    """GET YOURSELF A PIMP, YOU SLUT."""
     author = ctx.message.author
     if member is None:
         await bot.say("No such member.")
@@ -147,6 +148,7 @@ async def get_pimp(ctx, member: discord.Member):
 
 @bot.command(pass_context=True)
 async def slut(ctx):
+    """BECOME A SLUT FOR MONEY."""
     author = ctx.message.author
     if people.get_pimp(author.id) is not None:
         await bot.say("You're a pimp, mate, can't be a whore too.")
@@ -203,13 +205,13 @@ async def slut(ctx):
                           .format(number, number - number2, number2))
         elif pick == 4:
             gg = ggs.get_ggs(author.id)
-            number = randint(50, max(gg * 1/3, 100))
+            number = randint(50, max(int(gg * 1 / 3), 100))
             ggs.sub(author.id, number)
             await bot.say("You got caught and fined for {} GGs."
                           .format(number))
         elif pick == 5:
             gg = ggs.get_ggs(pimp.ide)
-            number = randint(50, max(gg * 1 / 3, 100))
+            number = randint(50, max(int(gg * 1 / 3), 100))
             ggs.sub(pimp.ide, number)
             await bot.say("You trespassed on another pimp's territory. It costs your pimp, {},  {} GGs."
                           .format(pimp.mention, number))
