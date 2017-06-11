@@ -136,7 +136,7 @@ async def get_pimp(ctx, member: discord.Member):
                 return
             people.add_pimp(member.id, member.name)
             pimp = people.get_pimp(member.id)
-        worker.add_pimp(pimp)
+        people.add_pimp_to_worker(author.id, pimp)
         await bot.say("{} is now your pimp, {}, congratulations. You can now use the ?prostitute command."
                       .format(member.name, author.mention))
         return

@@ -3,6 +3,8 @@ from discord.ext import commands
 from GG import gg_manager as ggs
 import random
 import aiohttp
+from GG import gg_manager
+from person import people
 
 
 description = """It's gonna be kewl soon"""
@@ -12,6 +14,7 @@ bot = commands.Bot(command_prefix='?', description=description)
 
 @bot.event
 async def on_ready():
+    people.connect(gg_manager.conn)
     print("Logged in")
 
 
