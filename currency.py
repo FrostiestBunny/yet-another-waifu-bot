@@ -147,6 +147,21 @@ async def get_pimp(ctx, member: discord.Member):
 
 
 @bot.command(pass_context=True)
+async def check_pimp(ctx):
+    author = ctx.message.author
+    if people.get_pimp(author.id) is not None:
+        await bot.say("You're a pimp yourself, mate.")
+        return
+    worker = people.get_worker(author.id)
+    if worker is None:
+        await bot.say("You're not even registered as a slut.")
+        return
+
+    pimp = worker.get_pimp()
+    await bot.say("Your pimp is {}.".format(pimp.username))
+
+
+@bot.command(pass_context=True)
 async def slut(ctx):
     """BECOME A SLUT FOR MONEY."""
     author = ctx.message.author
