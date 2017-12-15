@@ -3,6 +3,7 @@ from bot import bot
 from GG import gg_manager as ggs
 import util
 import cards
+import random
 
 
 @bot.command(name="rps", pass_context=True)
@@ -242,3 +243,25 @@ async def cards_blackjack(ctx, *args: discord.Member):
             ggs.sub(player.id, bets[player.id])
 
     await bot.say("THE END")
+
+
+@bot.command(pass_context=True)
+async def secret_santa(ctx, *args: discord.Member):
+    """Use this command with a list of participants"""
+    channel = ctx.message.channel
+    await bot.say("Secret Santa begins!")
+    members = list(args)
+    lots = [member.name for member in members]
+    random.shuffle(members)
+
+    def draw(drawer, array):
+        pick = random.choice(array)
+        while pick == drawer:
+            pick = random.choice(array)
+        array.remove(pick)
+        return pick
+
+    for member in members:
+        result = draw(member.name, lots)
+        await bot.send_message(member, "You picked, {0}".format(result))
+    await bot.send_message(channel, "Secret Santa done!")
