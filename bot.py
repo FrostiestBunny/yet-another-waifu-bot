@@ -41,8 +41,6 @@ async def change_avatar(ctx, url: str):
 
 @bot.command(pass_context=True)
 async def word_ratio(ctx, word, user: discord.Member, message_limit=None):
-    if message_limit is None:
-        message_limit = bot.max_messages
 
     message_counter = 0
     word_counter = 0
@@ -52,10 +50,10 @@ async def word_ratio(ctx, word, user: discord.Member, message_limit=None):
             message_content = message.content.lower()
             count = message_content.count(word.lower())
             word_counter += count
-        if message_counter == message_limit:
+        if message_limit is not None and message_counter == message_limit:
             break
     if message_counter == 0:
-        await bot.say("{} didn't say anything in the last {} messages.".format(user.name, message_limit))
+        await bot.say("{} didn't say anything in the last {} messages.".format(user.name, message_counter))
         return
 
     if word_counter == 0:
@@ -64,7 +62,7 @@ async def word_ratio(ctx, word, user: discord.Member, message_limit=None):
 
     ratio = word_counter / message_counter
     await bot.say("{}'s ratio of {} per message in the last {} messages is:\n {:.2f}".format(
-        user.name, word, message_limit, ratio))
+        user.name, word, message_counter, ratio))
 
 
 @bot.command(pass_context=True)
