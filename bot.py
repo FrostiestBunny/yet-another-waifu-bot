@@ -48,7 +48,9 @@ async def word_ratio(ctx, word, user: discord.Member, message_limit=None):
         if message.author == user:
             message_counter += 1
             message_content = message.content.lower()
+            await bot.say(message_content)
             count = message_content.count(word.lower())
+            await bot.say("Count: {}".format(count))
             word_counter += count
         if message_limit is not None and message_counter == message_limit:
             break
@@ -59,8 +61,8 @@ async def word_ratio(ctx, word, user: discord.Member, message_limit=None):
     if word_counter == 0:
         await bot.say("{} didn't mention the word even once.".format(user.name))
         return
-
     ratio = word_counter / message_counter
+    await bot.say("{} / {} = {}".format(word_counter, message_counter, ratio))
     await bot.say("{}'s ratio of {} per message in the last {} messages is:\n {:.2f}".format(
         user.name, word, message_counter, ratio))
 
