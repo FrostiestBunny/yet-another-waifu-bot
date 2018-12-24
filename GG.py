@@ -1,7 +1,6 @@
 import os
 import psycopg2
 import urllib.parse as urlparse
-import os
 
 DB_TOKEN = os.getenv("HEROKU_POSTGRESQL_SILVER_URL")
 
