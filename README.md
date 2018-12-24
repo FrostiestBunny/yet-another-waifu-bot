@@ -1,1 +1,1 @@
-# yet-another-waifu-bot
+# It's gonna be the best, you'll see.
