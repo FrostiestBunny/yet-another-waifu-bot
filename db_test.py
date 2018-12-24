@@ -3,7 +3,7 @@ import urllib.parse as urlparse
 
 import os
 
-DB_TOKEN = os.getenv("WAIFU_DB_TOKEN")
+DB_TOKEN = os.getenv("HEROKU_POSTGRESQL_SILVER_URL")
 
 
 urlparse.uses_netloc.append("postgres")
