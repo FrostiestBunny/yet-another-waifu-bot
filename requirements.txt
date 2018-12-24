@@ -1,0 +1,4 @@
+discord.py
+aiohttp
+psycopg2
+pillow
