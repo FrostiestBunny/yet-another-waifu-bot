@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 @bot.command(pass_context=True)
 async def uwot(ctx, member: discord.Member, *args):
     url = member.avatar_url
-    with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             avatar = await resp.read()
     base = Image.open('images/uwot.png').convert('RGBA')
