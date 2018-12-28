@@ -3,6 +3,7 @@ from bot import bot
 import aiohttp
 import asyncio
 import random
+from player import players
 
 API_URL = "https://api.jikan.moe/v3/"
 
@@ -43,3 +44,11 @@ async def random_waifu(ctx):
             return
         failed_attempts += 1
         await asyncio.sleep(3)
+
+@bot.command(pass_context=True)
+async def add_players(ctx):
+    server = ctx.message.server
+    for member in server.members:
+        if not member.bot:
+            players.add_player(member.id, member.name)
+    await bot.say("Updated player database")

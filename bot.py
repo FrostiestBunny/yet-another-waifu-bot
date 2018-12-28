@@ -20,7 +20,7 @@ async def on_ready():
     people.connect(gg_manager.conn)
     players.connect(gg_manager.conn)
     waifus.connect(gg_manager.conn)
-    waifu_manager(gg_manager.conn)
+    waifu_manager.connect(gg_manager.conn)
     print("Logged in")
 
 
