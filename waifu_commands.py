@@ -30,12 +30,8 @@ async def find_waifu(ctx, *args: str):
 async def random_waifu(ctx):
     failed_attempts = 0
     while True:
-        response = ""
         char_id = random.randint(1, 99999)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(API_URL + "character/{}".format(char_id)) as resp:
-                response = await resp.json()
-        
+        response = await get_waifu_by_id(char_id)
         error = response.get('error', None)
         if error is None:
             await bot.say(response['url'])
@@ -44,6 +40,12 @@ async def random_waifu(ctx):
             return
         failed_attempts += 1
         await asyncio.sleep(3)
+
+async def get_waifu_by_id(mal_id):
+    async with aiohttp.ClientSession() as session:
+            async with session.get(API_URL + "character/{}".format(mal_id)) as resp:
+                response = await resp.json()
+    return response
 
 @bot.command(pass_context=True)
 async def add_players(ctx):
