@@ -5,6 +5,9 @@ import random
 import aiohttp
 from GG import gg_manager
 from person import people
+from player import players
+from waifu import waifus
+from waifu_manager import waifu_manager
 
 
 description = """It's gonna be kewl soon"""
@@ -15,6 +18,9 @@ bot = commands.Bot(command_prefix='?', description=description)
 @bot.event
 async def on_ready():
     people.connect(gg_manager.conn)
+    players.connect(gg_manager.conn)
+    waifus.connect(gg_manager.conn)
+    waifu_manager(gg_manager.conn)
     print("Logged in")
 
 
