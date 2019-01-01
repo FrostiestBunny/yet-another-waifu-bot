@@ -20,8 +20,11 @@ async def on_ready():
     people.connect(gg_manager.conn)
     players.connect(gg_manager.conn)
     waifus.connect(gg_manager.conn)
+    waifu_manager.players = players
+    waifu_manager.waifus = waifus
     waifu_manager.connect(gg_manager.conn)
     print("Logged in")
+    print(waifu_manager.player_waifu)
 
 
 @bot.event

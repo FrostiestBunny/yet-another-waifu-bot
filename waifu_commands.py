@@ -4,6 +4,7 @@ import aiohttp
 import asyncio
 import random
 from player import players
+from waifu_manager import waifu_manager
 
 API_URL = "https://api.jikan.moe/v3/"
 
@@ -34,7 +35,8 @@ async def random_waifu(ctx):
         response = await get_waifu_by_id(char_id)
         error = response.get('error', None)
         if error is None:
-            await bot.say(response['url'])
+            waifu_manager.add_waifu_to_player(response['mal_id'], response['name'], ctx.message.author.id)
+            print("Added waifu")
             if failed_attempts > 0:
                 await bot.say("Failed attempts: {}".format(failed_attempts))
             return
