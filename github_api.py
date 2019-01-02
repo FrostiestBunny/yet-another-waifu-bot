@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 import os
+import json
 
 
 GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN")
@@ -27,3 +28,16 @@ async def create_card(body):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=payload, params=params, headers=headers) as resp:
             response = await resp.json()
+
+
+async def get_commits():
+    url = GITHUB_API_URL + "repos/zackunfair/yet-another-waifu-bot/commits"
+    params = {
+        'access_token': GITHUB_API_TOKEN
+    }
+    response = ""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=params) as resp:
+            response = await resp.json()
+    
+    return response

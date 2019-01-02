@@ -1,3 +1,4 @@
+import discord
 from bot import bot
 from GG import gg_manager
 import currency
@@ -68,6 +69,26 @@ def is_suggestion(message, user):
     return message.server.name == "MordredBot Dev"\
             and message.channel.name == "suggestions"\
             and user.id == '178887072864665600'
+
+
+@bot.command(pass_context=True)
+async def get_commits(ctx):
+    response = await github_api.get_commits()
+    message = ""
+    counter = 0
+    for row in response:
+        if counter == 5:
+            break
+        commit_author = row['commit']['author']['name']
+        commit_message = row['commit']['message']
+        message += "**" + commit_author + "**"
+        message += ":\n"
+        message += commit_message
+        message += "\n\n"
+        counter += 1
+    
+    embed = discord.Embed(title="Commits:", description=message, color=0x27F0DE)
+    await bot.send_message(ctx.message.channel, embed=embed)
 
 
 bot.run(TOKEN)
