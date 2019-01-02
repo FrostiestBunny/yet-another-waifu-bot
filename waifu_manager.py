@@ -1,6 +1,7 @@
 import time
 import psycopg2
 import discord
+import asyncio
 
 
 class WaifuManager:
@@ -20,7 +21,7 @@ class WaifuManager:
         self.cur = self.conn.cursor()
         self.load_player_waifu()
     
-    def add_waifu_to_player(self, mal_id, name, discord_id):
+    async def add_waifu_to_player(self, mal_id, name, discord_id):
         mal_id = str(mal_id)
         discord_id = str(discord_id)
         if self.player_waifu.get(discord_id, None) is None:
@@ -55,8 +56,11 @@ class WaifuManager:
         self.is_prepared = False
         return self.current_waifu_spawn.embed
     
-    def waifu_claimed(self):
+    async def waifu_claimed(self, discord_id):
+        mal_id = self.current_waifu_spawn.mal_id
+        name = self.current_waifu_spawn.name
         self.current_waifu_spawn = None
+        await self.add_waifu_to_player(mal_id, name, discord_id)
 
     def save(self):
         self.conn.commit()

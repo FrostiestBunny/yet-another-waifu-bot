@@ -1,0 +1,64 @@
+{
+    "request_hash": "request:search:000467e5f39183286e62ed6323e83550d97ad56f",
+    "request_cached": false,
+    "request_cache_expiry": 43200,
+    "results": [
+        {
+            "mal_id": 14040,
+            "url": "https://myanimelist.net/character/14040/Battler_Ushiromiya",
+            "image_url": "https://cdn.myanimelist.net/images/characters/4/83717.jpg?s=3bd2baf0229d9a38b5282db869f4b77b",
+            "name": "Ushiromiya, Battler",
+            "alternative_names": [
+                "Endless Sorcerer"
+            ],
+            "anime": [
+                {
+                    "mal_id": 4896,
+                    "type": "anime",
+                    "name": "Umineko no Naku Koro ni",
+                    "url": "https://myanimelist.net/anime/4896/Umineko_no_Naku_Koro_ni"
+                },
+                {
+                    "mal_id": 7568,
+                    "type": "anime",
+                    "name": "Umineko no Naku Koro ni Specials",
+                    "url": "https://myanimelist.net/anime/7568/Umineko_no_Naku_Koro_ni_Specials"
+                }
+            ],
+            "manga": []
+        },
+        {
+            "mal_id": 94079,
+            "url": "https://myanimelist.net/character/94079/Raira_April",
+            "image_url": "https://cdn.myanimelist.net/images/characters/6/224001.jpg?s=5cca91f17713375a2d5e6eb82015d4b6",
+            "name": "April, Raira",
+            "alternative_names": [],
+            "anime": [
+                {
+                    "mal_id": 19825,
+                    "type": "anime",
+                    "name": "Saikyou Ginga Ultimate Zero: Battle Spirits",
+                    "url": "https://myanimelist.net/anime/19825/Saikyou_Ginga_Ultimate_Zero__Battle_Spirits"
+                }
+            ],
+            "manga": []
+        },
+        {
+            "mal_id": 10060,
+            "url": "https://myanimelist.net/character/10060/Asap_Suzuki",
+            "image_url": "https://cdn.myanimelist.net/images/characters/7/110814.jpg?s=6b4c7aaf1a23987ef18d62f202a09b1a",
+            "name": "Suzuki, Asap",
+            "alternative_names": [],
+            "anime": [
+                {
+                    "mal_id": 574,
+                    "type": "anime",
+                    "name": "Rean no Tsubasa",
+                    "url": "https://myanimelist.net/anime/574/Rean_no_Tsubasa"
+                }
+            ],
+            "manga": []
+        }
+    ],
+    "last_page": 1
+}

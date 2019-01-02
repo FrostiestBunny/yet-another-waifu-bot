@@ -5,16 +5,15 @@ import asyncio
 import random
 from player import players
 from waifu_manager import waifu_manager
+import json
 
 
 API_URL = "https://api.jikan.moe/v3/"
 
 
-@bot.command(pass_context=True)
-async def find_waifu(ctx, *args: str):
-    name = ' '.join(args)
+async def find_waifu(name, limit):
     response = ""
-    params = {'q': name, 'limit': 3}
+    params = {'q': name, 'limit': limit}
     async with aiohttp.ClientSession() as session:
         async with session.get(API_URL + "search/character/", params=params) as resp:
             response = await resp.json()
@@ -24,10 +23,55 @@ async def find_waifu(ctx, *args: str):
         await bot.say("Character not found.")
         return
     msg = ""
+    return response
+
+
+@bot.command(pass_context=True)
+async def lookup(ctx, *args: str):
+    name = ' '.join(args)
+    message = ""
+    response = await find_waifu(name, 20)
     for character in response['results']:
-        msg += character['url']
-        msg += '\n'
-    await bot.say(msg)
+        character_name = character['name'].split(', ')
+        character_name.reverse()
+        character_name = ' '.join(character_name)
+        if name.lower() not in character_name.lower():
+            continue
+        message += str(character['mal_id'])
+        message += ": "
+        message += character_name
+        message += "\n"
+    embed = discord.Embed(title="Lookup: {}".format(name), description=message, color=0x200FB4)
+    await bot.send_message(ctx.message.channel, embed=embed)
+
+
+@bot.command(pass_context=True)
+async def info(ctx, *args: str):
+    name = ' '.join(args)
+    character_id = None
+    response = await find_waifu(name, 1)
+    character = response['results'][0]
+    character_id = str(character['mal_id'])
+    response = ""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_URL + "/character/{}/".format(character_id)) as resp:
+            response = await resp.json()
+    
+    description = response['about'][:249]
+    description += '...'
+    title = response['name'] + " ({}) ({})".format(response['name_kanji'], response['mal_id'])
+    embed = discord.Embed(title=title, description=description, color=0x8700B6 )
+    if response.get('animeography', None) is not None:
+        anime_list = ""
+        for anime in response['animeography']:
+            anime_list += anime['name']
+            anime_list += "\n"
+        embed.add_field(name="Anime", value=anime_list, inline=False)
+    embed._image = {
+            'url': str(response['image_url'])
+        }
+    embed.set_footer(text="Extended info soon")
+    await bot.send_message(ctx.message.channel, embed=embed)
 
 
 async def random_waifu(channel):
@@ -54,6 +98,11 @@ async def get_waifu_by_id(mal_id):
 
 
 @bot.command(pass_context=True)
+async def spawn(ctx):
+    await random_waifu(ctx.message.channel)
+
+
+@bot.command(pass_context=True)
 async def add_players(ctx):
     server = ctx.message.server
     for member in server.members:
@@ -64,12 +113,15 @@ async def add_players(ctx):
 
 @bot.command(pass_context=True)
 async def claim(ctx, *args: str):
+    if waifu_manager.current_waifu_spawn is None:
+        await bot.say("No active waifu spawn, what a shame.")
+        return
     name = ' '.join(args)
     if name.lower() == waifu_manager.current_waifu_spawn.name.lower():
         await bot.say("You got it, {}! (But not really yet.)".format(ctx.message.author.mention))
-        waifu_manager.waifu_claimed()
+        await waifu_manager.waifu_claimed(ctx.message.author.id)
     else:
-        await bot.say("Too bad, you suck.")
+        await bot.add_reaction(ctx.message, '❌')
 
 
 @bot.command(pass_context=True)
