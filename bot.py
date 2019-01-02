@@ -56,3 +56,8 @@ async def dismiss(ctx):
     else:
         await bot.say("You wish.")
         return
+
+
+@bot.command(pass_context=True)
+async def gib_code(ctx):
+    await bot.say("https://github.com/ZackUnfair/yet-another-waifu-bot")
