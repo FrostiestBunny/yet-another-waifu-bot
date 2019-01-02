@@ -41,7 +41,7 @@ async def on_message(message):
     if random.randint(0, 99) < 5:
         gg_manager.add(message.author.id, 10)
     if message.server.name in APPROVED_SERVERS and message.author.id == '178887072864665600':
-        if random.randint(0, 99) < 25:
+        if random.randint(0, 99) < 3:
             await waifu_commands.random_waifu(message.channel)
 
 
