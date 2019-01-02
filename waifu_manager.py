@@ -41,7 +41,7 @@ class WaifuManager:
             discord_id = self.players.get_player_by_id(player_id)
             if self.player_waifu.get(discord_id, None) is None:
                 self.player_waifu[discord_id] = []
-            self.player_waifu[discord_id].append(waifu_id)
+            self.player_waifu[discord_id].append(int(waifu_id))
     
     def prepare_waifu_spawn(self, waifu_props):
         mal_id = str(waifu_props['mal_id'])
@@ -61,6 +61,14 @@ class WaifuManager:
         name = self.current_waifu_spawn.name
         self.current_waifu_spawn = None
         await self.add_waifu_to_player(mal_id, name, discord_id)
+    
+    async def get_player_waifus(self, discord_id):
+        waifus = []
+        if self.player_waifu.get(discord_id, None) is None:
+            return None
+        for waifu_id in self.player_waifu[discord_id]:
+            waifus.append(self.waifus.waifus[waifu_id])
+        return waifus
 
     def save(self):
         self.conn.commit()

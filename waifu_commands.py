@@ -61,11 +61,16 @@ async def info(ctx, *args: str):
     description += '...'
     title = response['name'] + " ({}) ({})".format(response['name_kanji'], response['mal_id'])
     embed = discord.Embed(title=title, description=description, color=0x8700B6 )
-    if response.get('animeography', None) is not None:
+    if response.get('animeography', None) is not None and response['animeography'] != []:
         anime_list = ""
+        counter = 0
         for anime in response['animeography']:
+            if counter == 2:
+                anime_list += "..."
+                break
             anime_list += anime['name']
             anime_list += "\n"
+            counter += 1
         embed.add_field(name="Anime", value=anime_list, inline=False)
     embed._image = {
             'url': str(response['image_url'])
@@ -128,6 +133,27 @@ async def claim(ctx, *args: str):
 async def give_name_pls(ctx):
     await bot.say(
         "Name: {}.\n CHEATER ALERT (temp command obviously)".format(waifu_manager.current_waifu_spawn.name))
+
+
+@bot.command(pass_context=True, name='list')
+async def waifu_list(ctx, page: int=1):
+    waifus = await waifu_manager.get_player_waifus(ctx.message.author.id)
+    if waifus is None:
+        await bot.say("No waifus, that's pretty sad.")
+        return
+    message = ""
+    offset = 17
+    start = offset * (page - 1)
+    if start >= len(waifus):
+        return
+    end = offset * page
+    for waifu in waifus[start:end]:
+        message += waifu.name
+        message += " | Affection: {}".format(waifu.affection)
+        message += "\n"
+    title = "{}'s waifus (page {}):".format(ctx.message.author.name, page)
+    embed = discord.Embed(title=title, description=message, color=0xB346D8)
+    await bot.send_message(ctx.message.channel, embed=embed)
 
 
 @bot.command(pass_context=True)
