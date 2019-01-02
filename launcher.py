@@ -25,7 +25,14 @@ async def on_ready():
     waifu_manager.waifus = waifus
     waifu_manager.connect(gg_manager.conn)
     await waifu_commands.random_waifu(None)
+    await update_messages()
     print("Logged in")
+
+
+async def update_messages():
+    channel = await waifu_commands.get_suggestion_channel()
+    async for message in bot.logs_from(channel):
+        bot.messages.append(message)
 
 
 @bot.event
