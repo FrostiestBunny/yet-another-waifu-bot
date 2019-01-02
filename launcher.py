@@ -8,6 +8,7 @@ from person import people
 from player import players
 from waifu import waifus
 from waifu_manager import waifu_manager
+from bot_config import bot_config
 import waifu_commands
 import os
 import random
@@ -19,6 +20,7 @@ APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
 
 @bot.event
 async def on_ready():
+    bot_config.connect(gg_manager.conn)
     people.connect(gg_manager.conn)
     players.connect(gg_manager.conn)
     waifus.connect(gg_manager.conn)
@@ -49,9 +51,11 @@ async def on_message(message):
         await bot.send_message(message.channel, '\o')
     if random.randint(0, 99) < 5:
         gg_manager.add(message.author.id, 10)
-    if message.server.name in APPROVED_SERVERS and message.author.id == '178887072864665600':
+    if message.server.name in APPROVED_SERVERS:
         if random.randint(0, 99) < 3:
-            await waifu_commands.random_waifu(message.channel)
+            channel = bot.get_channel(bot_config.spawn_channel_id)
+            if channel is not None:
+                await waifu_commands.random_waifu(channel)
 
 
 @bot.event
@@ -89,6 +93,12 @@ async def get_commits(ctx):
     
     embed = discord.Embed(title="Commits:", description=message, color=0x27F0DE)
     await bot.send_message(ctx.message.channel, embed=embed)
+
+
+@bot.command(pass_context=True)
+async def set_spawn_channel(ctx, channel: discord.Channel):
+    bot_config.update_config(channel.id)
+    await bot.say("Spawn channel set to {}".format(channel.mention))
 
 
 bot.run(TOKEN)
