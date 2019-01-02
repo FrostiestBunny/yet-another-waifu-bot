@@ -24,8 +24,15 @@ class BotConfig:
         spawn_channel_id = query[0]
         self.spawn_channel_id = spawn_channel_id
     
-    def update_config(self, spawn_channel):
-        self.spawn_channel_id = spawn_channel
+    def update_config(self, spawn_channel_id):
+        if self.spawn_channel_id is not None:
+            #FIXME pls make this better
+            self.cur.execute("UPDATE bot_config SET spawn_channel = %s WHERE spawn_channel=%s",
+             (spawn_channel_id, self.spawn_channel_id,))
+            self.save()
+            self.spawn_channel_id = spawn_channel_id
+            return
+        self.spawn_channel_id = spawn_channel_id
         self.cur.execute("INSERT INTO bot_config (spawn_channel) VALUES (%s)", (self.spawn_channel_id,))
         self.save()
 
