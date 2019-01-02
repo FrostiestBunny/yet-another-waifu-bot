@@ -87,6 +87,8 @@ class WaifuSpawn:
         print(words)
         initials = ""
         for word in words:
+            if word == '':
+                continue
             initials += word[0]
             initials += '. '
         return initials

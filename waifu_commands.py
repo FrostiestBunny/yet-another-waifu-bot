@@ -81,13 +81,13 @@ async def give_name_pls(ctx):
 @bot.command(pass_context=True)
 async def suggest(ctx, *args):
     suggestion = ' '.join(args)
-    description = "*" + suggestion + "*"
+    description = suggestion
     embed = discord.Embed(title=ctx.message.author.name, description=description, color=0x0760FA )
     channel = await get_suggestion_channel()
     message = await bot.send_message(channel, embed=embed)
     await bot.add_reaction(message, ':yes_emoji:529842623532367872')
     await bot.add_reaction(message, ':no_emoji:529843815415021587')
-    await bot.say("Suggestion acknowledged.")
+    await bot.add_reaction(ctx.message, '👌')
 
 
 async def get_suggestion_channel():
@@ -96,17 +96,3 @@ async def get_suggestion_channel():
             for channel in server.channels:
                 if channel.name == "suggestions":
                     return channel
-
-
-@bot.event
-async def on_reaction_add(reaction, user):
-    message = reaction.message
-    if is_suggestion(message, user):
-        if reaction.emoji.name == "no_emoji":
-            await bot.delete_message(message)
-
-
-def is_suggestion(message, user):
-    return message.server.name == "MordredBot Dev"\
-            and message.channel.name == "suggestions"\
-            and user.id == '178887072864665600'

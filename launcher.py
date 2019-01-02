@@ -10,6 +10,7 @@ from waifu_manager import waifu_manager
 import waifu_commands
 import os
 import random
+import github_api
 
 TOKEN = os.getenv('WAIFU_BOT_TOKEN')
 APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
@@ -43,6 +44,23 @@ async def on_message(message):
     if message.server.name in APPROVED_SERVERS and message.author.id == '178887072864665600':
         if random.randint(0, 99) < 3:
             await waifu_commands.random_waifu(message.channel)
+
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    message = reaction.message
+    if is_suggestion(message, user):
+        if reaction.emoji.name == "no_emoji":
+            await bot.delete_message(message)
+        elif reaction.emoji.name == "yes_emoji":
+            await github_api.create_card(message.embeds[0]['description'])
+            await bot.delete_message(message)
+
+
+def is_suggestion(message, user):
+    return message.server.name == "MordredBot Dev"\
+            and message.channel.name == "suggestions"\
+            and user.id == '178887072864665600'
 
 
 bot.run(TOKEN)
