@@ -1,44 +1,13 @@
 import discord
 from discord.ext import commands
-from GG import gg_manager as ggs
+from GG import gg_manager
 import random
 import aiohttp
-from GG import gg_manager
-from person import people
-from player import players
-from waifu import waifus
-from waifu_manager import waifu_manager
 
 
 description = """It's gonna be kewl soon"""
 
 bot = commands.Bot(command_prefix='?', description=description)
-
-
-@bot.event
-async def on_ready():
-    people.connect(gg_manager.conn)
-    players.connect(gg_manager.conn)
-    waifus.connect(gg_manager.conn)
-    waifu_manager.players = players
-    waifu_manager.waifus = waifus
-    waifu_manager.connect(gg_manager.conn)
-    print("Logged in")
-
-
-@bot.event
-async def on_message(message):
-    await bot.process_commands(message)
-
-    if message.author.bot:
-        return
-
-    if message.content == '\o':
-        await bot.send_message(message.channel, 'o/')
-    elif message.content == 'o/':
-        await bot.send_message(message.channel, '\o')
-    if random.randint(0, 99) < 5:
-        ggs.add(message.author.id, 10)
 
 
 @bot.command(pass_context=True)
@@ -81,7 +50,7 @@ async def word_ratio(ctx, word, user: discord.Member, message_limit=None):
 async def dismiss(ctx):
     """Put the bot to sleep."""
     if ctx.message.author.id == '178887072864665600':
-        ggs.close()
+        gg_manager.close()
         await bot.say("Going to sleep.")
         await bot.logout()
     else:

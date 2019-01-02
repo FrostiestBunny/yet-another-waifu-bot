@@ -27,20 +27,17 @@ async def find_waifu(ctx, *args: str):
         msg += '\n'
     await bot.say(msg)
 
-@bot.command(pass_context=True)
-async def random_waifu(ctx):
-    failed_attempts = 0
+async def random_waifu(channel):
+    if waifu_manager.is_prepared:
+        response = waifu_manager.spawn_waifu()
+        await bot.send_message(channel, embed=response)
     while True:
         char_id = random.randint(1, 99999)
         response = await get_waifu_by_id(char_id)
         error = response.get('error', None)
         if error is None:
-            waifu_manager.add_waifu_to_player(response['mal_id'], response['name'], ctx.message.author.id)
-            print("Added waifu")
-            if failed_attempts > 0:
-                await bot.say("Failed attempts: {}".format(failed_attempts))
+            waifu_manager.prepare_waifu_spawn(response)
             return
-        failed_attempts += 1
         await asyncio.sleep(3)
 
 async def get_waifu_by_id(mal_id):
