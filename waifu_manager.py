@@ -54,6 +54,9 @@ class WaifuManager:
         self.prepared_waifu_spawn = None
         self.is_prepared = False
         return self.current_waifu_spawn.embed
+    
+    def waifu_claimed(self):
+        self.current_waifu_spawn = None
 
     def save(self):
         self.conn.commit()
@@ -69,11 +72,24 @@ class WaifuSpawn:
         self.prepare()
 
     def prepare(self):
-        embed = discord.Embed(title="This is the title.", description="This is the description.")
+        initials = self.get_initials()
+        embed = discord.Embed(title="Waifu Spawn",
+                                description="A wild waifu appeared.\n`?claim name` to catch them.\n\
+                                Their initials are `{}`".format(initials),
+                                color=0x07FAA2)
         embed._image = {
             'url': str(self.image_url)
         }
         self.embed = embed
+
+    def get_initials(self):
+        words = self.name.split(' ')
+        print(words)
+        initials = ""
+        for word in words:
+            initials += word[0]
+            initials += '. '
+        return initials
 
 
 waifu_manager = WaifuManager()
