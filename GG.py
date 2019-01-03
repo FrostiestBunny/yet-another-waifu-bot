@@ -21,11 +21,11 @@ class GGManager:
             port=url.port
         )
         self.cur = self.conn.cursor()
-        self.cur.execute("SELECT * FROM users;")
-        query = self.cur.fetchall()
-        for row in query:
-            _id, ggs, username = row
-            self.ggs_data[str(_id)] = {'name': str(username), 'ggs': int(ggs)}
+        # self.cur.execute("SELECT * FROM users;")
+        # query = self.cur.fetchall()
+        # for row in query:
+        #     _id, ggs, username = row
+        #     self.ggs_data[str(_id)] = {'name': str(username), 'ggs': int(ggs)}
 
     def save(self):
         self.conn.commit()

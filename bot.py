@@ -3,6 +3,7 @@ from discord.ext import commands
 from GG import gg_manager
 import random
 import aiohttp
+from http_session import http_session
 
 
 description = """It's gonna be kewl soon"""
@@ -51,7 +52,8 @@ async def dismiss(ctx):
     """Put the bot to sleep."""
     if ctx.message.author.id == '178887072864665600':
         gg_manager.close()
-        await bot.say("Going to sleep.")
+        await http_session.close()
+        await bot.add_reaction(ctx.message, '👌')
         await bot.logout()
     else:
         await bot.say("You wish.")

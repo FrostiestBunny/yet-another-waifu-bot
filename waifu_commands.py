@@ -5,7 +5,7 @@ import asyncio
 import random
 from player import players
 from waifu_manager import waifu_manager
-import json
+from http_session import http_session
 
 
 API_URL = "https://api.jikan.moe/v3/"
@@ -14,9 +14,9 @@ API_URL = "https://api.jikan.moe/v3/"
 async def find_waifu(name, limit):
     response = ""
     params = {'q': name, 'limit': limit}
-    async with aiohttp.ClientSession() as session:
-        async with session.get(API_URL + "search/character/", params=params) as resp:
-            response = await resp.json()
+    session = http_session.get_connection()
+    async with session.get(API_URL + "search/character/", params=params) as resp:
+        response = await resp.json()
     
     error = response.get('error', None)
     if error is not None:
@@ -53,10 +53,10 @@ async def info(ctx, *args: str):
     character = response['results'][0]
     character_id = str(character['mal_id'])
     response = ""
-    async with aiohttp.ClientSession() as session:
-        async with session.get(API_URL + "/character/{}/".format(character_id)) as resp:
-            response = await resp.json()
-    
+    session = http_session.get_connection()
+    async with session.get(API_URL + "/character/{}/".format(character_id)) as resp:
+        response = await resp.json()
+
     description = response['about'][:249]
     description += '...'
     title = response['name'] + " ({}) ({})".format(response['name_kanji'], response['mal_id'])
@@ -96,9 +96,9 @@ async def random_waifu(channel):
 
 
 async def get_waifu_by_id(mal_id):
-    async with aiohttp.ClientSession() as session:
-            async with session.get(API_URL + "character/{}".format(mal_id)) as resp:
-                response = await resp.json()
+    session = http_session.get_connection()
+    async with session.get(API_URL + "character/{}".format(mal_id)) as resp:
+        response = await resp.json()
     return response
 
 

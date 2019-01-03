@@ -13,6 +13,7 @@ import waifu_commands
 import os
 import random
 import github_api
+from http_session import http_session
 
 TOKEN = os.getenv('WAIFU_BOT_TOKEN')
 APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
@@ -20,6 +21,7 @@ APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
 
 @bot.event
 async def on_ready():
+    http_session.connect()
     bot_config.connect(gg_manager.conn)
     people.connect(gg_manager.conn)
     players.connect(gg_manager.conn)
@@ -49,8 +51,6 @@ async def on_message(message):
         await bot.send_message(message.channel, 'o/')
     elif message.content == 'o/':
         await bot.send_message(message.channel, '\o')
-    if random.randint(0, 99) < 5:
-        gg_manager.add(message.author.id, 10)
     if message.server.name in APPROVED_SERVERS:
         if random.randint(0, 99) < 3:
             channel = bot.get_channel(bot_config.spawn_channel_id)
