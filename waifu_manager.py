@@ -15,11 +15,15 @@ class WaifuManager:
         self.current_waifu_spawn = None
         self.prepared_waifu_spawn = None
         self.is_prepared = False
+        self.claim_message = None
 
     def connect(self, conn):
         self.conn = conn
         self.cur = self.conn.cursor()
         self.load_player_waifu()
+    
+    def set_claim_message(self, claim_message):
+        self.claim_message = claim_message
     
     async def add_waifu_to_player(self, mal_id, name, discord_id):
         mal_id = str(mal_id)
@@ -61,6 +65,9 @@ class WaifuManager:
         name = self.current_waifu_spawn.name
         self.current_waifu_spawn = None
         await self.add_waifu_to_player(mal_id, name, discord_id)
+    
+    async def skip_waifu(self):
+        self.current_waifu_spawn = None
     
     async def get_player_waifus(self, discord_id):
         waifus = []

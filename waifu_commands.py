@@ -84,7 +84,8 @@ async def random_waifu(channel):
         return
     if waifu_manager.is_prepared:
         response = waifu_manager.spawn_waifu()
-        await bot.send_message(channel, embed=response)
+        message = await bot.send_message(channel, embed=response)
+        waifu_manager.set_claim_message(message)
     while True:
         char_id = random.randint(1, 99999)
         response = await get_waifu_by_id(char_id)
@@ -125,8 +126,28 @@ async def claim(ctx, *args: str):
     if name.lower() == waifu_manager.current_waifu_spawn.name.lower():
         await bot.say("You got it, {}! (But not really yet.)".format(ctx.message.author.mention))
         await waifu_manager.waifu_claimed(ctx.message.author.id)
+        claim_message = waifu_manager.claim_message
+        old_embed = claim_message.embeds[0]
+        description = old_embed['description'] + "\n**Claimed by {}**".format(ctx.message.author.name)
+        embed = discord.Embed(title=old_embed['title'], description=description, color=old_embed['color'])
+        embed._image = {
+            'url': old_embed['image']['url']
+        }
+        await bot.edit_message(claim_message, embed=embed)
     else:
         await bot.add_reaction(ctx.message, '❌')
+
+
+@bot.command(pass_context=True)
+async def skip(ctx):
+    if waifu_manager.current_waifu_spawn is None:
+        await bot.say("There's nothing to skip though 🤔")
+        return
+    await waifu_manager.skip_waifu()
+    claim_message = waifu_manager.claim_message
+    old_embed = claim_message.embeds[0]
+    embed = discord.Embed(title=old_embed['title'], description="SKIPPED", color=old_embed['color'])
+    await bot.edit_message(claim_message, embed=embed)
 
 
 @bot.command(pass_context=True)
