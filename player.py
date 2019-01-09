@@ -55,6 +55,13 @@ class Player:
         self.won_fights = won_fights
         self.lost_fights = lost_fights
         self.currency = currency
+        self.waifu_list = None
+    
+    def set_waifu_list(self, waifu_list):
+        self.waifu_list = waifu_list
+    
+    def get_waifu_list(self):
+        return self.waifu_list
 
 
 players = Players()

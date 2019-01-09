@@ -95,8 +95,7 @@ async def random_waifu(channel):
     while True:
         char_id = random.randint(1, 99999)
         response = await get_waifu_by_id(char_id)
-        error = response.get('error', None)
-        if error is None:
+        if response is not None:
             waifu_manager.prepare_waifu_spawn(response)
             return
         await asyncio.sleep(3)
@@ -167,22 +166,10 @@ async def give_name_pls(ctx):
 
 @bot.command(pass_context=True, name='list')
 async def waifu_list(ctx, page: int=1):
-    waifus = await waifu_manager.get_player_waifus(ctx.message.author.id)
-    if waifus is None:
+    embed = await waifu_manager.get_player_waifus(ctx.message.author.id, ctx.message.author.name, page)
+    if embed is None:
         await bot.say("No waifus, that's pretty sad.")
         return
-    message = ""
-    offset = 17
-    start = offset * (page - 1)
-    if start >= len(waifus):
-        return
-    end = offset * page
-    for waifu in waifus[start:end]:
-        message += waifu.name
-        message += " | Affection: {}".format(waifu.affection)
-        message += "\n"
-    title = "{}'s waifus (page {}):".format(ctx.message.author.name, page)
-    embed = discord.Embed(title=title, description=message, color=0xB346D8)
     await bot.send_message(ctx.message.channel, embed=embed)
 
 
