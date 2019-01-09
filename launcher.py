@@ -52,7 +52,7 @@ async def on_message(message):
     elif message.content == 'o/':
         await bot.send_message(message.channel, '\o')
     if message.server.name in APPROVED_SERVERS:
-        if random.randint(0, 99) < 3:
+        if random.randint(0, 99) < 1:
             channel = bot.get_channel(bot_config.spawn_channel_id)
             if channel is not None:
                 await waifu_commands.random_waifu(channel)
