@@ -96,8 +96,9 @@ async def random_waifu(channel):
         char_id = random.randint(1, 99999)
         response = await get_waifu_by_id(char_id)
         if response is not None:
-            waifu_manager.prepare_waifu_spawn(response)
-            return
+            if response['image_url'] != "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png":
+                waifu_manager.prepare_waifu_spawn(response)
+                return
         await asyncio.sleep(3)
 
 
