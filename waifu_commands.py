@@ -47,15 +47,21 @@ async def lookup(ctx, *args: str):
 
 @bot.command(pass_context=True)
 async def info(ctx, *args: str):
-    name = ' '.join(args)
-    character_id = None
-    response = await find_waifu(name, 1)
-    character = response['results'][0]
-    character_id = str(character['mal_id'])
-    response = ""
-    session = http_session.get_connection()
-    async with session.get(API_URL + "/character/{}/".format(character_id)) as resp:
-        response = await resp.json()
+    if args[0].isdigit():
+        response = await get_waifu_by_id(args[0])
+        if response is None:
+            await bot.say("No character with that id found")
+            return
+    else:
+        name = ' '.join(args)
+        character_id = None
+        response = await find_waifu(name, 1)
+        character = response['results'][0]
+        character_id = str(character['mal_id'])
+        response = ""
+        session = http_session.get_connection()
+        async with session.get(API_URL + "/character/{}/".format(character_id)) as resp:
+            response = await resp.json()
 
     description = response['about'][:249]
     description += '...'
@@ -100,6 +106,9 @@ async def get_waifu_by_id(mal_id):
     session = http_session.get_connection()
     async with session.get(API_URL + "character/{}".format(mal_id)) as resp:
         response = await resp.json()
+    error = response.get('error', None)
+    if error is not None:
+        return None
     return response
 
 
