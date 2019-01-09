@@ -25,7 +25,7 @@ class WaifuManager:
     def set_claim_message(self, claim_message):
         self.claim_message = claim_message
     
-    async def add_waifu_to_player(self, mal_id, name, discord_id):
+    def add_waifu_to_player(self, mal_id, name, discord_id):
         mal_id = str(mal_id)
         discord_id = str(discord_id)
         if self.player_waifu.get(discord_id, None) is None:
@@ -60,11 +60,11 @@ class WaifuManager:
         self.is_prepared = False
         return self.current_waifu_spawn.embed
     
-    async def waifu_claimed(self, discord_id):
+    def waifu_claimed(self, discord_id):
         mal_id = self.current_waifu_spawn.mal_id
         name = self.current_waifu_spawn.name
         self.current_waifu_spawn = None
-        await self.add_waifu_to_player(mal_id, name, discord_id)
+        self.add_waifu_to_player(mal_id, name, discord_id)
     
     async def skip_waifu(self):
         self.current_waifu_spawn = None

@@ -134,7 +134,7 @@ async def claim(ctx, *args: str):
     name = ' '.join(args)
     if name.lower() == waifu_manager.current_waifu_spawn.name.lower():
         await bot.say("You got it, {}! (But not really yet.)".format(ctx.message.author.mention))
-        await waifu_manager.waifu_claimed(ctx.message.author.id)
+        waifu_manager.waifu_claimed(ctx.message.author.id)
         claim_message = waifu_manager.claim_message
         old_embed = claim_message.embeds[0]
         description = old_embed['description'] + "\n**Claimed by {}**".format(ctx.message.author.name)
