@@ -103,7 +103,6 @@ class WaifuSpawn:
 
     def get_initials(self):
         words = self.name.split(' ')
-        print(words)
         initials = ""
         for word in words:
             if word == '':
