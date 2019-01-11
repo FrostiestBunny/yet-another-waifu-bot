@@ -11,17 +11,16 @@ from http_session import http_session
 API_URL = "https://api.jikan.moe/v3/"
 
 
-async def find_waifu(name, limit):
+async def find_mal(kind, name, limit):
     response = ""
     params = {'q': name, 'limit': limit}
     session = http_session.get_connection()
-    async with session.get(API_URL + "search/character/", params=params) as resp:
+    async with session.get(API_URL + "search/{}/".format(kind), params=params) as resp:
         response = await resp.json()
     
     error = response.get('error', None)
     if error is not None:
-        await bot.say("Character not found.")
-        return
+        return None
     msg = ""
     return response
 
@@ -30,7 +29,10 @@ async def find_waifu(name, limit):
 async def lookup(ctx, *args: str):
     name = ' '.join(args)
     message = ""
-    response = await find_waifu(name, 20)
+    response = await find_mal("character", name, 30)
+    if response is None:
+        await bot.say("Character not found")
+        return
     for character in response['results']:
         character_name = character['name'].split(', ')
         character_name.reverse()
@@ -38,7 +40,7 @@ async def lookup(ctx, *args: str):
         if name.lower() not in character_name.lower():
             continue
         message += str(character['mal_id'])
-        message += ": "
+        message += " | "
         message += character_name
         message += "\n"
     embed = discord.Embed(title="Lookup: {}".format(name), description=message, color=0x200FB4)
@@ -55,7 +57,10 @@ async def info(ctx, *args: str):
     else:
         name = ' '.join(args)
         character_id = None
-        response = await find_waifu(name, 1)
+        response = await find_mal("character", name, 1)
+        if response is None:
+            await bot.say("Character not found")
+            return
         character = response['results'][0]
         character_id = str(character['mal_id'])
         response = ""
@@ -82,6 +87,37 @@ async def info(ctx, *args: str):
             'url': str(response['image_url'])
         }
     embed.set_footer(text="Extended info soon")
+    await bot.send_message(ctx.message.channel, embed=embed)
+
+
+@bot.command(pass_context=True)
+async def series_lookup(ctx, *args: str):
+    message = ""
+    name = ' '.join(args)
+    anime_response = await find_mal("anime", name, 15)
+    manga_response = await find_mal("manga", name, 15)
+    if anime_response is None and manga_response is None:
+        await bot.say("Series not found")
+        return
+    if anime_response is not None:
+        for anime in anime_response['results']:
+            if name.lower() not in anime['title'].lower():
+                continue
+            message += str(anime['mal_id'])
+            message += " | "
+            message += anime['title']
+            message += " (A)"
+            message += "\n"
+    if manga_response is not None:
+        for manga in manga_response['results']:
+            if name.lower() not in manga['title'].lower():
+                continue
+            message += str(manga['mal_id'])
+            message += " | "
+            message += manga['title']
+            message += " (M)"
+            message += "\n"
+    embed = discord.Embed(title="Lookup: {}".format(name), description=message, color=0x200FB4)
     await bot.send_message(ctx.message.channel, embed=embed)
 
 
