@@ -6,6 +6,7 @@ import random
 from player import players
 from waifu_manager import waifu_manager
 from http_session import http_session
+import json
 
 
 API_URL = "https://api.jikan.moe/v3/"
@@ -121,6 +122,54 @@ async def series_lookup(ctx, *args: str):
     await bot.send_message(ctx.message.channel, embed=embed)
 
 
+@bot.command(pass_context=True)
+async def series_info(ctx, *args: str):
+    is_anime = True
+    if args[0].isdigit():
+        response = await get_series_characters_by_id("anime", args[0])
+        if response is None:
+            response = await get_series_characters_by_id("manga", args[0])
+            if response is None:
+                await bot.say("No series with this id")
+                return
+    else:
+        name = ' '.join(args)
+        series_id = None
+        response = await find_mal("anime", name, 1)
+        if response is None:
+            is_anime = False
+            response = await find_mal("manga", name, 1)
+            if response is None:
+                await bot.say("Series not found")
+                return
+        series = response['results'][0]
+        series_id = str(series['mal_id'])
+        session = http_session.get_connection()
+        if is_anime:
+            response = await get_series_characters_by_id("anime", series_id)
+        else:
+            response = await get_series_characters_by_id("manga", series_id)
+
+    message = ""
+    counter = 0
+    footer = ""
+    for character in response['characters']:
+        if counter == 30:
+            footer = "{} characters omitted.".format(len(response['characters']) - counter)
+            break
+        message += str(character['mal_id'])
+        message += " | "
+        character_name = character['name'].split(', ')
+        character_name.reverse()
+        character_name = ' '.join(character_name)
+        message += character_name
+        message += "\n"
+        counter += 1
+    embed = discord.Embed(title="Info", description=message, color=0x200FB4)
+    embed.set_footer(text=footer)
+    await bot.send_message(ctx.message.channel, embed=embed)
+
+
 async def random_waifu(channel):
     if waifu_manager.current_waifu_spawn is not None:
         return
@@ -142,6 +191,20 @@ async def get_waifu_by_id(mal_id):
     session = http_session.get_connection()
     async with session.get(API_URL + "character/{}".format(mal_id)) as resp:
         response = await resp.json()
+    error = response.get('error', None)
+    if error is not None:
+        return None
+    return response
+
+
+async def get_series_characters_by_id(kind, mal_id):
+    session = http_session.get_connection()
+    if kind == "anime":
+        async with session.get(API_URL + "{}/{}/characters_staff".format(kind, mal_id)) as resp:
+            response = await resp.json()
+    else:
+        async with session.get(API_URL + "{}/{}/characters".format(kind, mal_id)) as resp:
+            response = await resp.json()
     error = response.get('error', None)
     if error is not None:
         return None
