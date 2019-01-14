@@ -50,6 +50,16 @@ async def lookup(ctx, *args: str):
 
 @bot.command(pass_context=True)
 async def info(ctx, *args: str):
+    args = list(args)
+    if args[-1].startswith('-extended'):
+        DESCRIPTION_LIMIT = 1997
+        SERIES_LIMIT = 20
+        footer = "Use ?info to view shorter description."
+        del args[-1]
+    else:
+        DESCRIPTION_LIMIT = 249
+        SERIES_LIMIT = 2
+        footer = "Use ?info name -extended to view extended description."
     if args[0].isdigit():
         response = await get_waifu_by_id(args[0])
         if response is None:
@@ -69,28 +79,27 @@ async def info(ctx, *args: str):
         async with session.get(API_URL + "/character/{}/".format(character_id)) as resp:
             response = await resp.json()
 
-    description = response['about'][:249]
-    description += '...'
+    description = response['about'][:DESCRIPTION_LIMIT]
+    if len(response['about']) > DESCRIPTION_LIMIT:
+        description += '...'
     title = response['name'] + " ({}) ({})".format(response['name_kanji'], response['mal_id'])
     embed = discord.Embed(title=title, description=description, color=0x8700B6 )
-    with open("response.json", "w") as f:
-        json.dump(response, f)
     if response.get('animeography', None) is not None and response['animeography'] != []:
         anime_list = ""
         counter = 0
         for anime in response['animeography']:
-            if counter == 2:
+            if counter == SERIES_LIMIT:
                 anime_list += "..."
                 break
             anime_list += anime['name']
             anime_list += "\n"
             counter += 1
         embed.add_field(name="Anime", value=anime_list, inline=False)
-    elif response.get('mangaography', None) is not None and response['mangaography'] != []:
+    if response.get('mangaography', None) is not None and response['mangaography'] != []:
         manga_list = ""
         counter = 0
         for manga in response['mangaography']:
-            if counter == 2:
+            if counter == SERIES_LIMIT:
                 manga_list += "..."
                 break
             manga_list += manga['name']
@@ -100,7 +109,7 @@ async def info(ctx, *args: str):
     embed._image = {
             'url': str(response['image_url'])
         }
-    embed.set_footer(text="Extended info soon")
+    embed.set_footer(text=footer)
     await bot.send_message(ctx.message.channel, embed=embed)
 
 
@@ -137,8 +146,10 @@ async def series_lookup(ctx, *args: str):
 
 @bot.command(pass_context=True)
 async def series_info(ctx, *args: str):
+    args = list(args)
     if args[-1].startswith('-m'):
         is_anime = False
+        del args[-1]
     else:
         is_anime = True
     if args[0].isdigit():
