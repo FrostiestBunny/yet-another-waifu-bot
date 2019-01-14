@@ -73,6 +73,8 @@ async def info(ctx, *args: str):
     description += '...'
     title = response['name'] + " ({}) ({})".format(response['name_kanji'], response['mal_id'])
     embed = discord.Embed(title=title, description=description, color=0x8700B6 )
+    with open("response.json", "w") as f:
+        json.dump(response, f)
     if response.get('animeography', None) is not None and response['animeography'] != []:
         anime_list = ""
         counter = 0
@@ -84,6 +86,17 @@ async def info(ctx, *args: str):
             anime_list += "\n"
             counter += 1
         embed.add_field(name="Anime", value=anime_list, inline=False)
+    elif response.get('mangaography', None) is not None and response['mangaography'] != []:
+        manga_list = ""
+        counter = 0
+        for manga in response['mangaography']:
+            if counter == 2:
+                manga_list += "..."
+                break
+            manga_list += manga['name']
+            manga_list += "\n"
+            counter += 1
+        embed.add_field(name="Manga", value=manga_list, inline=False)
     embed._image = {
             'url': str(response['image_url'])
         }
