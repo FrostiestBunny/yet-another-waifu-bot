@@ -137,10 +137,14 @@ async def series_lookup(ctx, *args: str):
 
 @bot.command(pass_context=True)
 async def series_info(ctx, *args: str):
-    is_anime = True
+    if args[-1].startswith('-m'):
+        is_anime = False
+    else:
+        is_anime = True
     if args[0].isdigit():
         response = await get_series_characters_by_id("anime", args[0])
-        if response is None:
+        if response is None or not is_anime:
+            is_anime = False
             response = await get_series_characters_by_id("manga", args[0])
             if response is None:
                 await bot.say("No series with this id")
@@ -149,7 +153,7 @@ async def series_info(ctx, *args: str):
         name = ' '.join(args)
         series_id = None
         response = await find_mal("anime", name, 1)
-        if response is None:
+        if response is None or not is_anime:
             is_anime = False
             response = await find_mal("manga", name, 1)
             if response is None:
@@ -165,10 +169,13 @@ async def series_info(ctx, *args: str):
 
     message = ""
     counter = 0
-    footer = ""
+    if is_anime:
+        footer = "If you wanted a manga with the same id, use the same command with -m at the end.\n"
+    else:
+        footer = ""
     for character in response['characters']:
         if counter == 30:
-            footer = "{} characters omitted.".format(len(response['characters']) - counter)
+            footer += "{} characters omitted.".format(len(response['characters']) - counter)
             break
         message += str(character['mal_id'])
         message += " | "
@@ -178,7 +185,7 @@ async def series_info(ctx, *args: str):
         message += character_name
         message += "\n"
         counter += 1
-    embed = discord.Embed(title="Info", description=message, color=0x200FB4)
+    embed = discord.Embed(title=response['title'], description=message, color=0x200FB4)
     embed.set_footer(text=footer)
     await bot.send_message(ctx.message.channel, embed=embed)
 
@@ -215,9 +222,16 @@ async def get_series_characters_by_id(kind, mal_id):
     if kind == "anime":
         async with session.get(API_URL + "{}/{}/characters_staff".format(kind, mal_id)) as resp:
             response = await resp.json()
+        async with session.get(API_URL + "{}/{}".format(kind, mal_id)) as resp:
+            anime = await resp.json()
+        response['title'] = anime.get('title', "") + " (A)"
     else:
         async with session.get(API_URL + "{}/{}/characters".format(kind, mal_id)) as resp:
             response = await resp.json()
+        async with session.get(API_URL + "{}/{}".format(kind, mal_id)) as resp:
+            manga = await resp.json()
+        response['title'] = manga.get('title', "") + " (M)"
+
     error = response.get('error', None)
     if error is not None:
         return None
