@@ -329,3 +329,14 @@ async def get_suggestion_channel():
             for channel in server.channels:
                 if channel.name == "suggestions":
                     return channel
+
+
+@bot.command(pass_context=True)
+async def praise(ctx, member: discord.Member):
+    author = ctx.message.author
+    if member.id == author.id:
+        await bot.say("Praising yourself? How sad.\n*pats*")
+    elif member.id == bot.user.id:
+        await bot.say("Thanks! You are pretty cool yourself.")
+    else:
+        await bot.say("{}, you have been praised by {}! How nice of them!".format(member.mention, author.name))
