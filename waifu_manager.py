@@ -34,6 +34,9 @@ class WaifuManager:
         waifu_id = self.waifus.get_latest_waifu_id(mal_id)
         player_id = self.players.get_player_id(discord_id)
         self.player_waifu[discord_id].append(waifu_id)
+        player = self.players.players[discord_id]
+        if player.get_waifu_list() is not None:
+            player.get_waifu_list().append(self.waifus.waifus[waifu_id])
         self.cur.execute("INSERT INTO player_waifu (player_id, waifu_id) VALUES (%s, %s)", (player_id, waifu_id))
         self.save()
     
