@@ -345,3 +345,26 @@ async def praise(ctx, member: discord.Member):
         await bot.say("Thanks! You are pretty cool yourself.")
     else:
         await bot.say("{}, you have been praised by {}! How nice of them!".format(member.mention, author.name))
+
+
+@bot.command(pass_context=True)
+async def schedule(ctx, day: str):
+    day = day.lower()
+    session = http_session.get_connection()
+    async with session.get(API_URL + "schedule/{}".format(day)) as resp:
+        response = await resp.json()
+    embed = discord.Embed(title=day.capitalize(), color=0x09D3E3)
+    for anime in response[day]:
+        desc = ""
+        episodes = "unknown" if anime.get('episodes', None) is None else str(anime['episodes'])
+        desc += "**Episodes**: " + episodes
+        desc += "\n"
+        desc += "**Genres:** "
+        for genre in anime['genres']:
+            desc += "*{}* ".format(genre['name'])
+        desc += "\n"
+        desc += "Score: " + str(anime['score'])
+        desc += "\n"
+        desc += "Source: " + anime['source']
+        embed.add_field(name="**" + anime['title'] + "**", value=desc, inline=False)
+    await bot.send_message(ctx.message.channel, embed=embed)
