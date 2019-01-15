@@ -51,10 +51,12 @@ async def lookup(ctx, *args: str):
 @bot.command(pass_context=True)
 async def info(ctx, *args: str):
     args = list(args)
+    is_extended = False
     if args[-1].startswith('-extended'):
         DESCRIPTION_LIMIT = 1997
         SERIES_LIMIT = 20
         footer = "Use ?info to view shorter description."
+        is_extended = True
         del args[-1]
     else:
         DESCRIPTION_LIMIT = 249
@@ -106,6 +108,8 @@ async def info(ctx, *args: str):
             manga_list += "\n"
             counter += 1
         embed.add_field(name="Manga", value=manga_list, inline=False)
+    if is_extended:
+        embed.add_field(name="Favorites", value=response['member_favorites'])
     embed._image = {
             'url': str(response['image_url'])
         }
@@ -202,6 +206,7 @@ async def series_info(ctx, *args: str):
 
 
 async def random_waifu(channel):
+    DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
     if waifu_manager.current_waifu_spawn is not None:
         return
     if waifu_manager.is_prepared:
@@ -212,7 +217,7 @@ async def random_waifu(channel):
         char_id = random.randint(1, 99999)
         response = await get_waifu_by_id(char_id)
         if response is not None:
-            if response['image_url'] != "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png":
+            if response['image_url'] != DEFAULT_IMAGE_URL and response['member_favorites'] >= 5:
                 waifu_manager.prepare_waifu_spawn(response)
                 return
         await asyncio.sleep(3)
