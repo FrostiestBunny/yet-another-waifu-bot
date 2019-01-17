@@ -274,7 +274,7 @@ async def claim(ctx, *args: str):
         await bot.say("No active waifu spawn, what a shame.")
         return
     name = ' '.join(args)
-    if name.lower() == waifu_manager.current_waifu_spawn.name.lower():
+    if is_correct_name(name, waifu_manager.current_waifu_spawn.name):
         await bot.say("You got it, {}! (But not really yet.)".format(ctx.message.author.mention))
         waifu_manager.waifu_claimed(ctx.message.author.id)
         claim_message = waifu_manager.claim_message
@@ -287,6 +287,17 @@ async def claim(ctx, *args: str):
         await bot.edit_message(claim_message, embed=embed)
     else:
         await bot.add_reaction(ctx.message, '❌')
+
+
+def is_correct_name(guess, target):
+    guess = guess.lower()
+    target = target.lower()
+    guess = guess.split(' ')
+    target = target.split(' ')
+    for word in target:
+        if word not in guess:
+            return False
+    return True
 
 
 @bot.command(pass_context=True)
@@ -304,7 +315,7 @@ async def skip(ctx):
 @bot.command(pass_context=True)
 async def give_name_pls(ctx):
     await bot.say(
-        "Name: {}.\n CHEATER ALERT (temp command obviously)".format(waifu_manager.current_waifu_spawn.name))
+        "Name: {}\n CHEATER ALERT (temp command obviously)".format(waifu_manager.current_waifu_spawn.name))
 
 
 @bot.command(pass_context=True, name='list')
