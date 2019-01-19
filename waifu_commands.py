@@ -7,6 +7,8 @@ from player import players
 from waifu_manager import waifu_manager
 from http_session import http_session
 import json
+import itertools
+from difflib import SequenceMatcher
 
 
 API_URL = "https://api.jikan.moe/v3/"
@@ -286,7 +288,11 @@ async def claim(ctx, *args: str):
         }
         await bot.edit_message(claim_message, embed=embed)
     else:
-        await bot.add_reaction(ctx.message, '❌')
+        result = await calculate_similarity(name, waifu_manager.current_waifu_spawn.name)
+        if result > 5:
+            await bot.add_reaction(ctx.message, '❌')
+        else:
+            await bot.say("You were off by {} letter{}.".format(result, 's' if result > 1 else ''))
 
 
 def is_correct_name(guess, target):
@@ -298,6 +304,55 @@ def is_correct_name(guess, target):
         if word not in guess:
             return False
     return True
+
+
+async def calculate_similarity(guess, target):
+    guess = guess.lower()
+    guess = guess.split(' ')
+    target = target.lower()
+    target = target.split(' ')
+    if len(target) != len(guess):
+        return 99
+    target_perms = [' '.join(x) for x in itertools.permutations(target)]
+    min_result = 6
+    for perm in target_perms:
+        perm = perm.split(' ')
+        result = 0
+        groups = split_into_groups(list(itertools.product(perm, guess)), len(perm))
+        for group in groups:
+            min_group_result = 99999
+            for words in group:
+                if words[0][0] != words[1][0]:
+                    continue
+                mid_result = await calculate_word_similarity(words[1], words[0])
+                if mid_result < min_group_result:
+                    min_group_result = mid_result
+            result += min_group_result
+        if result < min_result:
+            min_result = result
+    return min_result
+
+
+def split_into_groups(perms, num_of_words):
+    result = [[] for x in range(len(perms) // num_of_words)]
+    j = 0
+    for i in range(len(perms)):
+        if i != 0 and (i % num_of_words) == 0:
+            j += 1
+        result[j].append(perms[i])
+    return result
+
+
+
+async def calculate_word_similarity(guess, target):
+    if guess == target:
+        return 0
+    matches = SequenceMatcher(None, guess, target).get_matching_blocks()
+    size = 0
+    for match in matches:
+        size += match.size
+    extra_letters = len(guess) - size
+    return (len(target) - size) + extra_letters
 
 
 @bot.command(pass_context=True)
