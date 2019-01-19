@@ -2,6 +2,7 @@ import time
 import psycopg2
 import discord
 import asyncio
+import random
 
 
 class WaifuManager:
@@ -50,10 +51,10 @@ class WaifuManager:
                 self.player_waifu[discord_id] = []
             self.player_waifu[discord_id].append(int(waifu_id))
     
-    def prepare_waifu_spawn(self, waifu_props):
+    def prepare_waifu_spawn(self, waifu_props, pictures):
         mal_id = str(waifu_props['mal_id'])
         name = waifu_props['name']
-        image_url = waifu_props['image_url']
+        image_url = random.choice(pictures)['large']
         self.prepared_waifu_spawn = WaifuSpawn(mal_id, name, image_url)
         self.is_prepared = True
     

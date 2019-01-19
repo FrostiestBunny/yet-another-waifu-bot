@@ -9,8 +9,10 @@ from http_session import http_session
 import json
 import itertools
 from difflib import SequenceMatcher
+from timers import timers
 
 
+WAIFU_CLAIM_DELTA = 60
 API_URL = "https://api.jikan.moe/v3/"
 
 
@@ -210,17 +212,29 @@ async def series_info(ctx, *args: str):
 async def random_waifu(channel):
     DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
     if waifu_manager.current_waifu_spawn is not None:
-        return
+        if timers.get_time() - timers.get_waifu_claim_timer() < WAIFU_CLAIM_DELTA:
+            return
+        await waifu_manager.skip_waifu()
+        claim_message = waifu_manager.claim_message
+        old_embed = claim_message.embeds[0]
+        desc = old_embed['description']
+        desc += "\nClaimed by nobody. So sad."
+        embed = discord.Embed(title=old_embed['title'], description=desc, color=old_embed['color'])
+        await bot.edit_message(claim_message, embed=embed)
     if waifu_manager.is_prepared:
         response = waifu_manager.spawn_waifu()
         message = await bot.send_message(channel, embed=response)
         waifu_manager.set_claim_message(message)
+        timers.set_waifu_claim_timer()
     while True:
         char_id = random.randint(1, 99999)
         response = await get_waifu_by_id(char_id)
         if response is not None:
             if response['image_url'] != DEFAULT_IMAGE_URL and response['member_favorites'] >= 5:
-                waifu_manager.prepare_waifu_spawn(response)
+                session = http_session.get_connection()
+                async with session.get(API_URL + "character/{}/pictures".format(response['mal_id'])) as resp:
+                    pictures = await resp.json()
+                waifu_manager.prepare_waifu_spawn(response, pictures['pictures'])
                 return
         await asyncio.sleep(3)
 
@@ -357,6 +371,12 @@ async def calculate_word_similarity(guess, target):
 
 @bot.command(pass_context=True)
 async def skip(ctx):
+    if ctx.message.author.id == "297869043640172545":
+        await bot.say("Matthew no")
+        return
+    if ctx.message.author.id != "178887072864665600":
+        await bot.say("You don't look like Zack to me.")
+        return
     if waifu_manager.current_waifu_spawn is None:
         await bot.say("There's nothing to skip though 🤔")
         return
@@ -369,6 +389,9 @@ async def skip(ctx):
 
 @bot.command(pass_context=True)
 async def give_name_pls(ctx):
+    if ctx.message.author.id == "297869043640172545":
+        await bot.say("You've been a bad boy, Matthew. Go to sleep.")
+        return
     await bot.say(
         "Name: {}\n CHEATER ALERT (temp command obviously)".format(waifu_manager.current_waifu_spawn.name))
 
