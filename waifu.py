@@ -29,7 +29,7 @@ class Waifus:
                           VALUES (%s, %s, %s, %s, %s, %s, now()::timestamp)", (name, None, 0, "1:1:1", mal_id, None))
         self.save()
         waifu_id = self.get_latest_waifu_id(mal_id)
-        self.waifus[waifu_id] = Waifu(mal_id, name)
+        self.waifus[waifu_id] = Waifu(waifu_id, mal_id, name)
     
     def get_latest_waifu_id(self, mal_id):
         self.cur.execute("SELECT waifu_id FROM waifus WHERE mal_id=%s ORDER BY acquired DESC LIMIT 1;", (mal_id,))
@@ -43,8 +43,9 @@ class Waifus:
 
 class Waifu:
 
-    def __init__(self, mal_id, name, nickname=None,
+    def __init__(self, waifu_id, mal_id, name, nickname=None,
                  affection=0, stats="1:1:1", last_interaction=None, acquired=None):
+        self.waifu_id = waifu_id
         self.mal_id = mal_id
         self.name = name
         self.nickname = nickname

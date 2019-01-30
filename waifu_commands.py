@@ -387,15 +387,6 @@ async def skip(ctx):
     await bot.edit_message(claim_message, embed=embed)
 
 
-@bot.command(pass_context=True)
-async def give_name_pls(ctx):
-    if ctx.message.author.id == "297869043640172545":
-        await bot.say("You've been a bad boy, Matthew. Go to sleep.")
-        return
-    await bot.say(
-        "Name: {}\n CHEATER ALERT (temp command obviously)".format(waifu_manager.current_waifu_spawn.name))
-
-
 @bot.command(pass_context=True, name='list')
 async def waifu_list(ctx, page: int=1):
     embed = await waifu_manager.get_player_waifus(ctx.message.author.id, ctx.message.author.name, page)
