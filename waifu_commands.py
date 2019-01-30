@@ -422,7 +422,12 @@ async def praise(ctx, member: discord.Member):
     if member.id == author.id:
         await bot.say("Praising yourself? How sad.\n*pats*")
     elif member.id == bot.user.id:
-        await bot.say("Thanks! You are pretty cool yourself.")
+        if author.id == "266639261523116053":
+            await bot.say("Aww, you didn't have to. You're the best ❤")
+        else:
+            await bot.say("Thanks! You are pretty cool yourself.")
+    elif member.id == "178887072864665600":
+        await bot.say("{}\nDad, you've been praised by {}. You're so popular.".format(member.mention, author.name))
     else:
         await bot.say("{}, you have been praised by {}! How nice of them!".format(member.mention, author.name))
 
@@ -448,3 +453,30 @@ async def schedule(ctx, day: str):
         desc += "Source: " + anime['source']
         embed.add_field(name="**" + anime['title'] + "**", value=desc, inline=False)
     await bot.send_message(ctx.message.channel, embed=embed)
+
+
+@bot.command(pass_context=True)
+async def insult(ctx, member: discord.Member):
+    name = member.nick if member.nick is not None else member.name
+    if member.id == bot.user.id:
+        await bot.say("No u.")
+        name = ctx.message.author.nick if ctx.message.author.nick is not None else ctx.message.author.name
+    session = http_session.get_connection()
+    params = {'who': name}
+    async with session.get("https://insult.mattbas.org/api/insult", params=params) as resp:
+            response = await resp.text()
+    await bot.say(response)
+
+
+@bot.command(pass_context=True)
+async def compliment(ctx, member: discord.Member):
+    if ctx.message.author.id == member.id:
+        await bot.say("Complimenting yourself? That's sad. But hey, at least I like you.")
+        return
+    session = http_session.get_connection()
+    async with session.get("https://complimentr.com/api") as resp:
+            response = await resp.json()
+    compliment = response["compliment"].capitalize() + "."
+    await bot.say("{}\n{}".format(member.mention, compliment))
+    if member.id == bot.user.id:
+        await bot.say("Wow, thank you, {}!".format(ctx.message.author.mention))
