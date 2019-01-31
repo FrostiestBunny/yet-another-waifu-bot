@@ -46,6 +46,11 @@ async def on_message(message):
 
     if message.author.bot:
         return
+    
+    if bot.user in message.mentions:
+        if message.content.lower().endswith("alright?") and message.author.id == "178887072864665600":
+            await bot.send_message(message.channel, "Sure, dad.")
+        return
 
     if message.content == '\o':
         await bot.send_message(message.channel, 'o/')

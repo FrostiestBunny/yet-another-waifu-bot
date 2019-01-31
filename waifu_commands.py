@@ -10,10 +10,13 @@ import json
 import itertools
 from difflib import SequenceMatcher
 from timers import timers
+import os
 
 
 WAIFU_CLAIM_DELTA = 60
 API_URL = "https://api.jikan.moe/v3/"
+COMICVINE_API_KEY = os.getenv("COMICVINE_API_KEY")
+COMICVINE_URL = "https://comicvine.gamespot.com/api/"
 
 
 async def find_mal(kind, name, limit):
@@ -480,3 +483,11 @@ async def compliment(ctx, member: discord.Member):
     await bot.say("{}\n{}".format(member.mention, compliment))
     if member.id == bot.user.id:
         await bot.say("Wow, thank you, {}!".format(ctx.message.author.mention))
+
+
+@bot.command(pass_context=True)
+async def say(ctx, channel_id: str, *args: str):
+    channel = bot.get_channel(channel_id)
+    msg = ' '.join(args)
+    if ctx.message.author.id == "178887072864665600":
+        await bot.send_message(channel, msg)
