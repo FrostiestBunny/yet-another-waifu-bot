@@ -20,7 +20,7 @@ class Waifus:
         query = self.cur.fetchall()
         for row in query:
             waifu_id, name, nickname, affection, stats, mal_id, last_interaction, acquired = row
-            self.waifus[int(waifu_id)] = Waifu(str(mal_id), str(name), str(nickname),
+            self.waifus[int(waifu_id)] = Waifu(int(waifu_id), str(mal_id), str(name), str(nickname),
                                         int(affection), str(stats), str(last_interaction), str(acquired))
     
     def add_waifu(self, mal_id, name):

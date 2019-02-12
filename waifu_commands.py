@@ -392,6 +392,8 @@ async def skip(ctx):
 
 @bot.command(pass_context=True, name='list')
 async def waifu_list(ctx, page: int=1):
+    if page < 1:
+        return
     embed = await waifu_manager.get_player_waifus(ctx.message.author.id, ctx.message.author.name, page)
     if embed is None:
         await bot.say("No waifus, that's pretty sad.")

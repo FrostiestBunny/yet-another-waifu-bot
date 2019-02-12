@@ -3,6 +3,7 @@ import psycopg2
 import discord
 import asyncio
 import random
+import math
 
 
 class WaifuManager:
@@ -89,8 +90,9 @@ class WaifuManager:
             player.set_waifu_list(waifus)
         waifus = player.get_waifu_list()
         message = ""
-        offset = 17
+        offset = 20
         start = offset * (page - 1)
+        max_pages = math.ceil(len(waifus) / offset)
         if start >= len(waifus):
             return
         end = offset * page
@@ -101,7 +103,9 @@ class WaifuManager:
             message += " | Affection: {}".format(waifu.affection)
             message += "\n"
         title = "{}'s waifus (page {}):".format(name, page)
+        footer = "Page {} of {}".format(page, max_pages)
         embed = discord.Embed(title=title, description=message, color=0xB346D8)
+        embed.set_footer(text=footer)
         return embed
 
     def save(self):
