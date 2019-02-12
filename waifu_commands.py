@@ -17,6 +17,7 @@ WAIFU_CLAIM_DELTA = 60
 API_URL = "https://api.jikan.moe/v3/"
 COMICVINE_API_KEY = os.getenv("COMICVINE_API_KEY")
 COMICVINE_URL = "https://comicvine.gamespot.com/api/"
+COMICVINE_TOTAL_CHARS = 100000
 
 
 async def find_mal(kind, name, limit):
@@ -214,6 +215,12 @@ async def series_info(ctx, *args: str):
 
 async def random_waifu(channel):
     DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
+
+    if random.randint(0, 99) < 50:
+        comicvine = True
+    else:
+        comicvine = False
+
     if waifu_manager.current_waifu_spawn is not None:
         if timers.get_time() - timers.get_waifu_claim_timer() < WAIFU_CLAIM_DELTA:
             return
@@ -230,16 +237,23 @@ async def random_waifu(channel):
         waifu_manager.set_claim_message(message)
         timers.set_waifu_claim_timer()
     while True:
-        char_id = random.randint(1, 99999)
-        response = await get_waifu_by_id(char_id)
-        if response is not None:
-            if response['image_url'] != DEFAULT_IMAGE_URL and response['member_favorites'] >= 5:
-                session = http_session.get_connection()
-                async with session.get(API_URL + "character/{}/pictures".format(response['mal_id'])) as resp:
-                    pictures = await resp.json()
-                waifu_manager.prepare_waifu_spawn(response, pictures['pictures'])
-                return
-        await asyncio.sleep(3)
+        if comicvine:
+            response = await get_random_comic_char()
+            if response is not None:
+                if not response['results'][0]['image']['medium_url'].endswith('blank.png'):
+                    waifu_manager.prepare_comic_spawn(response)
+                    return
+        else:
+            char_id = random.randint(1, 99999)
+            response = await get_waifu_by_id(char_id)
+            if response is not None:
+                if response['image_url'] != DEFAULT_IMAGE_URL and response['member_favorites'] >= 5:
+                    session = http_session.get_connection()
+                    async with session.get(API_URL + "character/{}/pictures".format(response['mal_id'])) as resp:
+                        pictures = await resp.json()
+                    waifu_manager.prepare_waifu_spawn(response, pictures['pictures'])
+                    return
+            await asyncio.sleep(3)
 
 
 async def get_waifu_by_id(mal_id):
@@ -249,6 +263,23 @@ async def get_waifu_by_id(mal_id):
     error = response.get('error', None)
     if error is not None:
         return None
+    return response
+
+
+async def get_random_comic_char():
+    global COMICVINE_TOTAL_CHARS
+    session = http_session.get_connection()
+    params = {
+        'api_key': COMICVINE_API_KEY,
+        'format': 'json',
+        'limit': 1,
+        'offset': random.randint(0, COMICVINE_TOTAL_CHARS)
+    }
+    async with session.get(COMICVINE_URL + "characters", params=params) as resp:
+        response = await resp.json()
+    if response['error'] != "OK":
+        return None
+    COMICVINE_TOTAL_CHARS = int(response['number_of_total_results'])
     return response
 
 

@@ -62,6 +62,14 @@ class WaifuManager:
         self.prepared_waifu_spawn = WaifuSpawn(mal_id, name, image_url)
         self.is_prepared = True
     
+    def prepare_comic_spawn(self, waifu_props):
+        character_props = waifu_props['results'][0]
+        comic_id = str(character_props['id'])
+        name = character_props['name']
+        image_url = character_props['image']['medium_url']
+        self.prepared_waifu_spawn = WaifuSpawn(comic_id, name, image_url)
+        self.is_prepared = True
+    
     def spawn_waifu(self):
         self.current_waifu_spawn = self.prepared_waifu_spawn
         self.prepared_waifu_spawn = None
