@@ -216,7 +216,7 @@ async def series_info(ctx, *args: str):
 async def random_waifu(channel):
     DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
 
-    if random.randint(0, 99) < 50:
+    if random.randint(0, 99) < 30:
         comicvine = True
     else:
         comicvine = False
