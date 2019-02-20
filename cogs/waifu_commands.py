@@ -486,6 +486,21 @@ class WaifuCommands:
         msg = ' '.join(args)
         if ctx.message.author.id == "178887072864665600":
             await self.bot.send_message(channel, msg)
+    
+    @command(pass_context=True)
+    async def hug(self, ctx: Context, member: discord.Member):
+        author = ctx.message.author
+        if member.id == author.id:
+            await self.bot.say("How does that work? 🤔")
+            return
+        if member.id == self.bot.user.id:
+            if author.id not in ["178887072864665600", "266639261523116053"]:
+                await self.bot.say("Uh, sorry, but no.")
+                return
+        gif_name = random.choice(os.listdir('images/hugs'))
+        with open(f'images/hugs/{gif_name}', "rb") as gif:
+            msg = f"{ctx.message.author.mention} hugs {member.mention}"
+            await self.bot.send_file(ctx.message.channel, gif, filename="hug.gif", content=msg)
 
 
 def setup(bot):
