@@ -1,15 +1,12 @@
 import discord
-from bot import bot
-from GG import gg_manager
-import currency
-import games
-import image_fun
+from discord.ext import commands
+from glob import glob
 from person import people
 from player import players
 from waifu import waifus
 from waifu_manager import waifu_manager
 from bot_config import bot_config
-import waifu_commands
+from GG import gg_manager
 import os
 import random
 import github_api
@@ -18,9 +15,12 @@ from http_session import http_session
 TOKEN = os.getenv('WAIFU_BOT_TOKEN')
 APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
 
+description = """The best waifu bot."""
+bot = commands.Bot(command_prefix='?', description=description)
 
 @bot.event
 async def on_ready():
+    load_extensions()
     http_session.connect()
     bot_config.connect(gg_manager.conn)
     people.connect(gg_manager.conn)
@@ -29,15 +29,38 @@ async def on_ready():
     waifu_manager.players = players
     waifu_manager.waifus = waifus
     waifu_manager.connect(gg_manager.conn)
+    waifu_commands = bot.get_cog('WaifuCommands')
     await waifu_commands.random_waifu(None)
     await update_messages()
     print("Logged in")
 
 
+def load_extensions():
+    extensions = get_extensions()
+    for ext in extensions:
+        try:
+            bot.load_extension(ext)
+        except Exception as e:
+            print(e)
+
+
+def get_extensions():
+    ext = glob('cogs/[!_]*.py')
+    return [i.replace('\\', '.').replace('/', '.')[:-3] for i in ext]
+
+
 async def update_messages():
-    channel = await waifu_commands.get_suggestion_channel()
+    channel = await get_suggestion_channel()
     async for message in bot.logs_from(channel):
         bot.messages.append(message)
+
+
+async def get_suggestion_channel():
+    for server in bot.servers:
+        if server.name == "MordredBot Dev":
+            for channel in server.channels:
+                if channel.name == "suggestions":
+                    return channel
 
 
 @bot.event
@@ -60,6 +83,7 @@ async def on_message(message):
         if random.randint(0, 99) < 1:
             channel = bot.get_channel(bot_config.spawn_channel_id)
             if channel is not None:
+                waifu_commands = bot.get_cog('WaifuCommands')
                 await waifu_commands.random_waifu(channel)
 
 
@@ -78,6 +102,18 @@ def is_suggestion(message, user):
     return message.server.name == "MordredBot Dev"\
             and message.channel.name == "suggestions"\
             and user.id == '178887072864665600'
+
+
+@bot.command(pass_context=True)
+async def suggest(ctx, *args):
+    suggestion = ' '.join(args)
+    description = suggestion
+    embed = discord.Embed(title=ctx.message.author.name, description=description, color=0x0760FA )
+    channel = await get_suggestion_channel()
+    message = await bot.send_message(channel, embed=embed)
+    await bot.add_reaction(message, ':yes_emoji:529842623532367872')
+    await bot.add_reaction(message, ':no_emoji:529843815415021587')
+    await bot.add_reaction(ctx.message, '👌')
 
 
 @bot.command(pass_context=True)
