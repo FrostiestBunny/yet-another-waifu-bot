@@ -104,7 +104,10 @@ class WaifuManager:
         if start >= len(waifus):
             return
         end = offset * page
-        for n, waifu in enumerate(waifus[start:end], start):
+        enumeration = enumerate(waifus)
+        reversible_list = [(a, b) for a, b in enumeration]
+        reversible_list.reverse()
+        for n, waifu in reversible_list[start:end]:
             message += str(n)
             message += " | "
             message += waifu.name
