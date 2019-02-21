@@ -501,6 +501,21 @@ class WaifuCommands:
         with open(f'images/hugs/{gif_name}', "rb") as gif:
             msg = f"{ctx.message.author.mention} hugs {member.mention}"
             await self.bot.send_file(ctx.message.channel, gif, filename="hug.gif", content=msg)
+    
+    @command(pass_context=True)
+    async def view(self, ctx: Context, list_id: int):
+        author = ctx.message.author
+        waifu = await waifu_manager.get_player_waifu(author.id, list_id)
+        if waifu is None:
+            await self.bot.say(f"No waifu with id {list_id}")
+            return
+        waifu_data = await self.get_waifu_by_id(waifu.mal_id)
+        desc = "More info soon"
+        embed = discord.Embed(title=waifu.name, description=desc, color=0x200FB4)
+        embed._image = {
+            'url': waifu_data['image_url']
+        }
+        await self.bot.send_message(ctx.message.channel, embed=embed)
 
 
 def setup(bot):

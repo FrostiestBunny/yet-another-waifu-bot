@@ -85,18 +85,24 @@ class WaifuManager:
     async def skip_waifu(self):
         self.current_waifu_spawn = None
     
+    async def get_player_waifu(self, discord_id, list_id):
+        if self.player_waifu.get(discord_id, None) is None:
+            return None
+        player = self.players.players[discord_id]
+        waifu_list = await self._get_player_waifu_list(player)
+        try:
+            waifu = waifu_list[list_id]
+        except IndexError:
+            waifu = None
+        return waifu
+    
     async def get_player_waifus(self, discord_id, name, page):
         waifus = []
         if self.player_waifu.get(discord_id, None) is None:
             return None
         
         player = self.players.players[discord_id]
-
-        if player.get_waifu_list() is None:
-            for waifu_id in self.player_waifu[discord_id]:
-                waifus.append(self.waifus.waifus[waifu_id])
-            player.set_waifu_list(waifus)
-        waifus = player.get_waifu_list()
+        waifus = await self._get_player_waifu_list(player)
         message = ""
         offset = 20
         start = offset * (page - 1)
@@ -118,6 +124,14 @@ class WaifuManager:
         embed = discord.Embed(title=title, description=message, color=0xB346D8)
         embed.set_footer(text=footer)
         return embed
+    
+    async def _get_player_waifu_list(self, player):
+        waifus = []
+        if player.get_waifu_list() is None:
+            for waifu_id in self.player_waifu[player._id]:
+                waifus.append(self.waifus.waifus[waifu_id])
+            player.set_waifu_list(waifus)
+        return player.get_waifu_list()
 
     def save(self):
         self.conn.commit()
