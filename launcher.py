@@ -33,7 +33,6 @@ async def on_ready():
     waifu_commands = bot.get_cog('WaifuCommands')
     await waifu_commands.random_waifu(None)
     await update_messages()
-    await http_session.close()
     print("Logged in")
 
 
