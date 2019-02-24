@@ -1,7 +1,4 @@
-import time
-import psycopg2
 import discord
-import asyncio
 import random
 import math
 
@@ -23,16 +20,16 @@ class WaifuManager:
         self.conn = conn
         self.cur = self.conn.cursor()
         self.load_player_waifu()
-    
+
     def set_claim_message(self, claim_message):
         self.claim_message = claim_message
-    
-    def add_waifu_to_player(self, mal_id, name, discord_id):
+
+    def add_waifu_to_player(self, mal_id, name, is_comicvine, discord_id):
         mal_id = str(mal_id)
         discord_id = str(discord_id)
         if self.player_waifu.get(discord_id, None) is None:
             self.player_waifu[discord_id] = []
-        self.waifus.add_waifu(mal_id, name)
+        self.waifus.add_waifu(mal_id, name, is_comicvine)
         waifu_id = self.waifus.get_latest_waifu_id(mal_id)
         player_id = self.players.get_player_id(discord_id)
         self.player_waifu[discord_id].append(waifu_id)
@@ -41,7 +38,7 @@ class WaifuManager:
             player.get_waifu_list().append(self.waifus.waifus[waifu_id])
         self.cur.execute("INSERT INTO player_waifu (player_id, waifu_id) VALUES (%s, %s)", (player_id, waifu_id))
         self.save()
-    
+
     def load_player_waifu(self):
         self.cur.execute("SELECT player_id, waifu_id FROM player_waifu;")
         query = self.cur.fetchall()
@@ -51,7 +48,7 @@ class WaifuManager:
             if self.player_waifu.get(discord_id, None) is None:
                 self.player_waifu[discord_id] = []
             self.player_waifu[discord_id].append(int(waifu_id))
-    
+
     def prepare_waifu_spawn(self, waifu_props, pictures):
         mal_id = str(waifu_props['mal_id'])
         name = waifu_props['name']
@@ -59,32 +56,33 @@ class WaifuManager:
             image_url = random.choice(pictures)['large']
         except IndexError:
             image_url = waifu_props['image_url']
-        self.prepared_waifu_spawn = WaifuSpawn(mal_id, name, image_url)
+        self.prepared_waifu_spawn = WaifuSpawn(mal_id, name, image_url, is_comicvine=False)
         self.is_prepared = True
-    
+
     def prepare_comic_spawn(self, waifu_props):
         character_props = waifu_props['results'][0]
         comic_id = str(character_props['id'])
         name = character_props['name']
         image_url = character_props['image']['medium_url']
-        self.prepared_waifu_spawn = WaifuSpawn(comic_id, name, image_url)
+        self.prepared_waifu_spawn = WaifuSpawn(comic_id, name, image_url, is_comicvine=True)
         self.is_prepared = True
-    
+
     def spawn_waifu(self):
         self.current_waifu_spawn = self.prepared_waifu_spawn
         self.prepared_waifu_spawn = None
         self.is_prepared = False
         return self.current_waifu_spawn.embed
-    
+
     def waifu_claimed(self, discord_id):
         mal_id = self.current_waifu_spawn.mal_id
         name = self.current_waifu_spawn.name
+        is_comicvine = self.current_waifu_spawn.is_comicvine
         self.current_waifu_spawn = None
-        self.add_waifu_to_player(mal_id, name, discord_id)
-    
+        self.add_waifu_to_player(mal_id, name, is_comicvine, discord_id)
+
     async def skip_waifu(self):
         self.current_waifu_spawn = None
-    
+
     async def get_player_waifu(self, discord_id, list_id):
         if self.player_waifu.get(discord_id, None) is None:
             return None
@@ -95,12 +93,12 @@ class WaifuManager:
         except IndexError:
             waifu = None
         return waifu
-    
+
     async def get_player_waifus(self, discord_id, name, page):
         waifus = []
         if self.player_waifu.get(discord_id, None) is None:
             return None
-        
+
         player = self.players.players[discord_id]
         waifus = await self._get_player_waifu_list(player)
         message = ""
@@ -124,7 +122,7 @@ class WaifuManager:
         embed = discord.Embed(title=title, description=message, color=0xB346D8)
         embed.set_footer(text=footer)
         return embed
-    
+
     async def _get_player_waifu_list(self, player):
         waifus = []
         if player.get_waifu_list() is None:
@@ -139,10 +137,11 @@ class WaifuManager:
 
 class WaifuSpawn:
 
-    def __init__(self, mal_id, name, image_url):
+    def __init__(self, mal_id, name, image_url, is_comicvine):
         self.mal_id = mal_id
         self.name = name
         self.image_url = image_url
+        self.is_comicvine = is_comicvine
         self.embed = None
         self.prepare()
 

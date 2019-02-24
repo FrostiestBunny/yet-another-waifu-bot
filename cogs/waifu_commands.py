@@ -1,12 +1,10 @@
 import discord
 from discord.ext.commands import command, Context
-import aiohttp
 import asyncio
 import random
 from player import players
 from waifu_manager import waifu_manager
 from http_session import http_session
-import json
 import itertools
 from difflib import SequenceMatcher
 from timers import timers
@@ -31,11 +29,10 @@ class WaifuCommands:
         session = http_session.get_connection()
         async with session.get(API_URL + "search/{}/".format(kind), params=params) as resp:
             response = await resp.json()
-        
+
         error = response.get('error', None)
         if error is not None:
             return None
-        msg = ""
         return response
 
     @command(pass_context=True)
@@ -96,7 +93,7 @@ class WaifuCommands:
         if len(response['about']) > DESCRIPTION_LIMIT:
             description += '...'
         title = response['name'] + " ({}) ({})".format(response['name_kanji'], response['mal_id'])
-        embed = discord.Embed(title=title, description=description, color=0x8700B6 )
+        embed = discord.Embed(title=title, description=description, color=0x8700B6)
         if response.get('animeography', None) is not None and response['animeography'] != []:
             anime_list = ""
             counter = 0
@@ -185,7 +182,6 @@ class WaifuCommands:
                     return
             series = response['results'][0]
             series_id = str(series['mal_id'])
-            session = http_session.get_connection()
             if is_anime:
                 response = await self.get_series_characters_by_id("anime", series_id)
             else:
@@ -214,13 +210,15 @@ class WaifuCommands:
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
     async def random_waifu(self, channel):
+        print("Starting random waifu")
         DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
 
-        if random.randint(0, 99) < 30:
+        if random.randint(0, 99) < -1:
             comicvine = True
+            print("Comicvine")
         else:
             comicvine = False
-
+            print("Not comicvine")
         if waifu_manager.current_waifu_spawn is not None:
             if timers.get_time() - timers.get_waifu_claim_timer() < WAIFU_CLAIM_DELTA:
                 return
@@ -237,6 +235,7 @@ class WaifuCommands:
             waifu_manager.set_claim_message(message)
             timers.set_waifu_claim_timer()
         while True:
+            print("Trying to find waifu")
             if comicvine:
                 response = await self.get_random_comic_char()
                 if response is not None:
@@ -245,7 +244,9 @@ class WaifuCommands:
                         return
             else:
                 char_id = random.randint(1, 99999)
+                print("got random id")
                 response = await self.get_waifu_by_id(char_id)
+                print("got response")
                 if response is not None:
                     if response['image_url'] != DEFAULT_IMAGE_URL and response['member_favorites'] >= 5:
                         session = http_session.get_connection()
@@ -257,8 +258,10 @@ class WaifuCommands:
 
     async def get_waifu_by_id(self, mal_id):
         session = http_session.get_connection()
+        print("Got session")
         async with session.get(API_URL + "character/{}".format(mal_id)) as resp:
             response = await resp.json()
+        print("Got response in get_waifu_by_id")
         error = response.get('error', None)
         if error is not None:
             return None
@@ -464,7 +467,7 @@ class WaifuCommands:
         session = http_session.get_connection()
         params = {'who': name}
         async with session.get("https://insult.mattbas.org/api/insult", params=params) as resp:
-                response = await resp.text()
+            response = await resp.text()
         await self.bot.say(response)
 
     @command(pass_context=True)
@@ -474,7 +477,7 @@ class WaifuCommands:
             return
         session = http_session.get_connection()
         async with session.get("https://complimentr.com/api") as resp:
-                response = await resp.json()
+            response = await resp.json()
         compliment = response["compliment"].capitalize() + "."
         await self.bot.say("{}\n{}".format(member.mention, compliment))
         if member.id == self.bot.user.id:
@@ -486,7 +489,7 @@ class WaifuCommands:
         msg = ' '.join(args)
         if ctx.message.author.id == "178887072864665600":
             await self.bot.send_message(channel, msg)
-    
+
     @command(pass_context=True)
     async def hug(self, ctx: Context, member: discord.Member):
         author = ctx.message.author
@@ -501,7 +504,7 @@ class WaifuCommands:
         with open(f'images/hugs/{gif_name}', "rb") as gif:
             msg = f"{ctx.message.author.mention} hugs {member.mention}"
             await self.bot.send_file(ctx.message.channel, gif, filename="hug.gif", content=msg)
-    
+
     @command(pass_context=True)
     async def view(self, ctx: Context, list_id: int):
         author = ctx.message.author

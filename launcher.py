@@ -18,6 +18,7 @@ APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
 description = """The best waifu bot."""
 bot = commands.Bot(command_prefix='?', description=description)
 
+
 @bot.event
 async def on_ready():
     load_extensions()
@@ -32,6 +33,7 @@ async def on_ready():
     waifu_commands = bot.get_cog('WaifuCommands')
     await waifu_commands.random_waifu(None)
     await update_messages()
+    await http_session.close()
     print("Logged in")
 
 
@@ -69,7 +71,7 @@ async def on_message(message):
 
     if message.author.bot:
         return
-    
+
     if bot.user in message.mentions:
         if message.content.lower().endswith("alright?") and message.author.id == "178887072864665600":
             await bot.send_message(message.channel, "Sure, dad.")
@@ -108,7 +110,7 @@ def is_suggestion(message, user):
 async def suggest(ctx, *args):
     suggestion = ' '.join(args)
     description = suggestion
-    embed = discord.Embed(title=ctx.message.author.name, description=description, color=0x0760FA )
+    embed = discord.Embed(title=ctx.message.author.name, description=description, color=0x0760FA)
     channel = await get_suggestion_channel()
     message = await bot.send_message(channel, embed=embed)
     await bot.add_reaction(message, ':yes_emoji:529842623532367872')
@@ -131,7 +133,7 @@ async def get_commits(ctx):
         message += commit_message
         message += "\n\n"
         counter += 1
-    
+
     embed = discord.Embed(title="Commits:", description=message, color=0x27F0DE)
     await bot.send_message(ctx.message.channel, embed=embed)
 
