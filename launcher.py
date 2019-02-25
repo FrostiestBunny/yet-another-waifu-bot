@@ -29,7 +29,7 @@ async def on_ready():
     waifus.connect(gg_manager.conn)
     waifu_manager.players = players
     waifu_manager.waifus = waifus
-    waifu_manager.connect(gg_manager.conn)
+    # waifu_manager.connect(gg_manager.conn)
     waifu_commands = bot.get_cog('WaifuCommands')
     await waifu_commands.random_waifu(None)
     await update_messages()

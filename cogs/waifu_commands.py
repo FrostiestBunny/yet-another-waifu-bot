@@ -27,7 +27,7 @@ class WaifuCommands:
         response = ""
         params = {'q': name, 'limit': limit}
         session = http_session.get_connection()
-        async with session.get(API_URL + "search/{}/".format(kind), params=params) as resp:
+        async with session.get(API_URL + f"search/{kind}/", params=params) as resp:
             response = await resp.json()
 
         error = response.get('error', None)
@@ -53,7 +53,8 @@ class WaifuCommands:
             message += " | "
             message += character_name
             message += "\n"
-        embed = discord.Embed(title="Lookup: {}".format(name), description=message, color=0x200FB4)
+        embed = discord.Embed(title=f"Lookup: {name}", description=message,
+                              color=0x200FB4)
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
     @command(pass_context=True)
@@ -86,15 +87,16 @@ class WaifuCommands:
             character_id = str(character['mal_id'])
             response = ""
             session = http_session.get_connection()
-            async with session.get(API_URL + "/character/{}/".format(character_id)) as resp:
+            async with session.get(API_URL + f"/character/{character_id}/") as resp:
                 response = await resp.json()
 
         description = response['about'][:DESCRIPTION_LIMIT]
         if len(response['about']) > DESCRIPTION_LIMIT:
             description += '...'
-        title = response['name'] + " ({}) ({})".format(response['name_kanji'], response['mal_id'])
+        title = f"{response['name']} ({response['name_kanji']}) ({response['mal_id']})"
         embed = discord.Embed(title=title, description=description, color=0x8700B6)
-        if response.get('animeography', None) is not None and response['animeography'] != []:
+        if response.get('animeography', None) is not None and\
+                response['animeography'] != []:
             anime_list = ""
             counter = 0
             for anime in response['animeography']:
@@ -105,7 +107,8 @@ class WaifuCommands:
                 anime_list += "\n"
                 counter += 1
             embed.add_field(name="Anime", value=anime_list, inline=False)
-        if response.get('mangaography', None) is not None and response['mangaography'] != []:
+        if response.get('mangaography', None) is not None and\
+                response['mangaography'] != []:
             manga_list = ""
             counter = 0
             for manga in response['mangaography']:
@@ -151,7 +154,8 @@ class WaifuCommands:
                 message += manga['title']
                 message += " (M)"
                 message += "\n"
-        embed = discord.Embed(title="Lookup: {}".format(name), description=message, color=0x200FB4)
+        embed = discord.Embed(title=f"Lookup: {name}", description=message,
+                              color=0x200FB4)
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
     @command(pass_context=True)
@@ -190,12 +194,12 @@ class WaifuCommands:
         message = ""
         counter = 0
         if is_anime:
-            footer = "If you wanted a manga with the same id, use the same command with -m at the end.\n"
+            footer = "For manga with the same id, use this command with -m at the end.\n"
         else:
             footer = ""
         for character in response['characters']:
             if counter == 30:
-                footer += "{} characters omitted.".format(len(response['characters']) - counter)
+                footer += f"{len(response['characters']) - counter} characters omitted."
                 break
             message += str(character['mal_id'])
             message += " | "
@@ -205,7 +209,8 @@ class WaifuCommands:
             message += character_name
             message += "\n"
             counter += 1
-        embed = discord.Embed(title=response['title'], description=message, color=0x200FB4)
+        embed = discord.Embed(title=response['title'], description=message,
+                              color=0x200FB4)
         embed.set_footer(text=footer)
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
@@ -224,7 +229,8 @@ class WaifuCommands:
             old_embed = claim_message.embeds[0]
             desc = old_embed['description']
             desc += "\nClaimed by nobody. So sad."
-            embed = discord.Embed(title=old_embed['title'], description=desc, color=old_embed['color'])
+            embed = discord.Embed(title=old_embed['title'],
+                                  description=desc, color=old_embed['color'])
             await self.bot.edit_message(claim_message, embed=embed)
         if waifu_manager.is_prepared:
             response = waifu_manager.spawn_waifu()
@@ -242,9 +248,11 @@ class WaifuCommands:
                 char_id = random.randint(1, 99999)
                 response = await self.get_waifu_by_id(char_id)
                 if response is not None:
-                    if response['image_url'] != DEFAULT_IMAGE_URL and response['member_favorites'] >= 5:
+                    if response['image_url'] != DEFAULT_IMAGE_URL and\
+                            response['member_favorites'] >= 5:
                         session = http_session.get_connection()
-                        async with session.get(API_URL + "character/{}/pictures".format(response['mal_id'])) as resp:
+                        async with session.get(
+                                API_URL + f"character/{response['mal_id']}/pictures") as resp:
                             pictures = await resp.json()
                         waifu_manager.prepare_waifu_spawn(response, pictures['pictures'])
                         return
@@ -278,7 +286,7 @@ class WaifuCommands:
     async def get_series_characters_by_id(self, kind, mal_id):
         session = http_session.get_connection()
         if kind == "anime":
-            async with session.get(API_URL + "{}/{}/characters_staff".format(kind, mal_id)) as resp:
+            async with session.get(API_URL + f"{kind}/{mal_id}/characters_staff") as resp:
                 response = await resp.json()
             async with session.get(API_URL + "{}/{}".format(kind, mal_id)) as resp:
                 anime = await resp.json()
@@ -314,22 +322,27 @@ class WaifuCommands:
             return
         name = ' '.join(args)
         if self.is_correct_name(name, waifu_manager.current_waifu_spawn.name):
-            await self.bot.say("You got it, {}! (But not really yet.)".format(ctx.message.author.mention))
+            await self.bot.say(
+                    f"You got it, {ctx.message.author.mention}! (But not really yet.)")
             waifu_manager.waifu_claimed(ctx.message.author.id)
             claim_message = waifu_manager.claim_message
             old_embed = claim_message.embeds[0]
-            description = old_embed['description'] + "\n**Claimed by {}**".format(ctx.message.author.name)
-            embed = discord.Embed(title=old_embed['title'], description=description, color=old_embed['color'])
+            author = ctx.message.author
+            description = f"{old_embed['description']}\n**Claimed by {author.name}**"
+            embed = discord.Embed(title=old_embed['title'], description=description,
+                                  color=old_embed['color'])
             embed._image = {
                 'url': old_embed['image']['url']
             }
             await self.bot.edit_message(claim_message, embed=embed)
         else:
-            result = await self.calculate_similarity(name, waifu_manager.current_waifu_spawn.name)
+            result = await self.calculate_similarity(
+                name, waifu_manager.current_waifu_spawn.name)
             if result > 5:
                 await self.bot.add_reaction(ctx.message, '❌')
             else:
-                await self.bot.say("You were off by {} letter{}.".format(result, 's' if result > 1 else ''))
+                await self.bot.say(
+                    "You were off by {} letter{}.".format(result, 's' if result > 1 else ''))
 
     def is_correct_name(self, guess, target):
         guess = guess.lower()
@@ -400,14 +413,16 @@ class WaifuCommands:
         await waifu_manager.skip_waifu()
         claim_message = waifu_manager.claim_message
         old_embed = claim_message.embeds[0]
-        embed = discord.Embed(title=old_embed['title'], description="SKIPPED", color=old_embed['color'])
+        embed = discord.Embed(title=old_embed['title'], description="SKIPPED",
+                              color=old_embed['color'])
         await self.bot.edit_message(claim_message, embed=embed)
 
     @command(pass_context=True, name='list')
-    async def waifu_list(self, ctx: Context, page: int=1):
+    async def waifu_list(self, ctx: Context, page: int = 1):
         if page < 1:
             return
-        embed = await waifu_manager.get_player_waifus(ctx.message.author.id, ctx.message.author.name, page)
+        author = ctx.message.author
+        embed = await waifu_manager.get_player_waifus(author.id, author.name, page)
         if embed is None:
             await self.bot.say("No waifus, that's pretty sad.")
             return
@@ -424,9 +439,11 @@ class WaifuCommands:
             else:
                 await self.bot.say("Thanks! You are pretty cool yourself.")
         elif member.id == "178887072864665600":
-            await self.bot.say("{}\nDad, you've been praised by {}. You're so popular.".format(member.mention, author.name))
+            await self.bot.say(
+                f"{member.mention}\nDad, {author.name} praised you. You're so popular.")
         else:
-            await self.bot.say("{}, you have been praised by {}! How nice of them!".format(member.mention, author.name))
+            await self.bot.say(
+                f"{member.mention}, you have been praised by {author.name}! How nice of them!")
 
     @command(pass_context=True)
     async def schedule(self, ctx: Context, day: str):
@@ -437,7 +454,7 @@ class WaifuCommands:
         embed = discord.Embed(title=day.capitalize(), color=0x09D3E3)
         for anime in response[day]:
             desc = ""
-            episodes = "unknown" if anime.get('episodes', None) is None else str(anime['episodes'])
+            episodes = "N/A" if anime.get('episodes', None) is None else str(anime['episodes'])
             desc += "**Episodes**: " + episodes
             desc += "\n"
             desc += "**Genres:** "
@@ -453,9 +470,10 @@ class WaifuCommands:
     @command(pass_context=True)
     async def insult(self, ctx: Context, member: discord.Member):
         name = member.nick if member.nick is not None else member.name
+        author = ctx.message.author
         if member.id == self.bot.user.id:
             await self.bot.say("No u.")
-            name = ctx.message.author.nick if ctx.message.author.nick is not None else ctx.message.author.name
+            name = author.nick if author.nick is not None else author.name
         session = http_session.get_connection()
         params = {'who': name}
         async with session.get("https://insult.mattbas.org/api/insult", params=params) as resp:
@@ -465,7 +483,8 @@ class WaifuCommands:
     @command(pass_context=True)
     async def compliment(self, ctx: Context, member: discord.Member):
         if ctx.message.author.id == member.id:
-            await self.bot.say("Complimenting yourself? That's sad. But hey, at least I like you.")
+            await self.bot.say(
+                "Complimenting yourself? That's sad. But hey, at least I like you.")
             return
         session = http_session.get_connection()
         async with session.get("https://complimentr.com/api") as resp:
