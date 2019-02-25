@@ -9,6 +9,7 @@ import itertools
 from difflib import SequenceMatcher
 from timers import timers
 import os
+import json
 
 
 WAIFU_CLAIM_DELTA = 60
@@ -126,6 +127,90 @@ class WaifuCommands:
         }
         embed.set_footer(text=footer)
         await self.bot.send_message(ctx.message.channel, embed=embed)
+    
+    @command(pass_context=True)
+    async def cinfo(self, ctx: Context, *args: str):
+        args = list(args)
+        is_extended = False
+        author = ctx.message.author
+        r_map = {
+            "0": "0⃣",
+            "1": "1⃣",
+            "2": "2⃣",
+            "3": "3⃣",
+            "4": "4⃣"
+        }
+
+        if args[-1].startswith('-extended'):
+            is_extended = True
+            del args[-1]
+        else:
+            footer = "Use ?cinfo name -extended to view extended description."
+        
+        name = ' '.join(args)
+        response = await self.find_comicvine_char(name)
+        
+        embed = discord.Embed(title=name.capitalize(), color=0x09d3e3)
+        for i, character in enumerate(response['results']):
+            embed.add_field(name=f"{i}: **{character['name']}**",
+                            value=f"Real name: {character['real_name']}",
+                            inline=False)
+        msg = await self.bot.send_message(ctx.message.channel, embed=embed)
+        await self.bot.add_reaction(msg, r_map["0"])
+        await self.bot.add_reaction(msg, r_map["1"])
+        await self.bot.add_reaction(msg, r_map["2"])
+        await self.bot.add_reaction(msg, r_map["3"])
+        await self.bot.add_reaction(msg, r_map["4"])
+
+        def check(reaction, user):
+            e = str(reaction.emoji)
+            return e.startswith(('0⃣', '1⃣', '2⃣', '3⃣', '4⃣')) and user.id == author.id
+
+        res = await self.bot.wait_for_reaction(message=msg, check=check, timeout=60)
+        await self.bot.delete_message(msg)
+        if res is None:
+            await self.bot.say("You didn't pick in time, too bad.")
+            return
+        choice = None
+        for k, v in r_map.items():
+            if v == res.reaction.emoji:
+                choice = int(k)
+                break
+        url = response['results'][choice]['api_detail_url']
+        session = http_session.get_connection()
+        params = {
+            'api_key': COMICVINE_API_KEY,
+            'format': 'json',
+            'field_list': 'name,real_name,deck,image,site_detail_url'
+        }
+        async with session.get(url, params=params) as resp:
+            response = await resp.json()
+        
+        character = response["results"]
+        embed = discord.Embed(title=f"**{character['name']}**", color=0x09d3e3,
+                              url=character['site_detail_url'])
+        embed._image = {
+            'url': character['image']['medium_url']
+        }
+        embed.add_field(name="Real name", value=character['real_name'], inline=False)
+        embed.add_field(name="Description", value=character['deck'], inline=False)
+        await self.bot.send_message(ctx.message.channel, embed=embed)
+
+    async def find_comicvine_char(self, name):
+        session = http_session.get_connection()
+        params = {
+            'api_key': COMICVINE_API_KEY,
+            'format': 'json',
+            'limit': 5,
+            'query': name,
+            'resources': 'character',
+            'field_list': 'name,api_detail_url,real_name'
+        }
+        async with session.get(COMICVINE_URL + "search", params=params) as resp:
+            response = await resp.json()
+        if response['error'] != "OK":
+            return None
+        return response
 
     @command(pass_context=True)
     async def series_lookup(self, ctx: Context, *args: str):
