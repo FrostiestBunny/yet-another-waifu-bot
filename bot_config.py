@@ -1,9 +1,3 @@
-import time
-import psycopg2
-import discord
-import asyncio
-
-
 class BotConfig:
 
     def __init__(self):

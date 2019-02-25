@@ -1,7 +1,5 @@
-import asyncio
 import aiohttp
 import os
-import json
 
 
 GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN")

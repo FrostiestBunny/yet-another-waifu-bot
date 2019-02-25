@@ -2,7 +2,6 @@ import argparse
 import discord
 from discord.ext import commands
 from glob import glob
-from person import people
 from player import players
 from waifu import waifus
 from waifu_manager import waifu_manager
@@ -18,13 +17,13 @@ APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
 LAST_STATUS = None
 LAST_GAME = None
 
-description = """The best waifu bot."""
-bot = commands.Bot(command_prefix='?', description=description)
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--maintenance", help="turn on maintenance mode",
                     action="store_true")
 COMMAND_ARGS = parser.parse_args()
+
+description = """The best waifu bot."""
+bot = commands.Bot(command_prefix='?', description=description)
 
 
 @bot.event
@@ -33,7 +32,6 @@ async def on_ready():
     load_extensions()
     http_session.connect()
     bot_config.connect(gg_manager.conn)
-    people.connect(gg_manager.conn)
     players.connect(gg_manager.conn)
     waifus.connect(gg_manager.conn)
     waifu_manager.players = players
