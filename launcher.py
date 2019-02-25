@@ -1,3 +1,4 @@
+import argparse
 import discord
 from discord.ext import commands
 from glob import glob
@@ -14,13 +15,21 @@ from http_session import http_session
 
 TOKEN = os.getenv('WAIFU_BOT_TOKEN')
 APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
+LAST_STATUS = None
+LAST_GAME = None
 
 description = """The best waifu bot."""
 bot = commands.Bot(command_prefix='?', description=description)
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-m", "--maintenance", help="turn on maintenance mode",
+                    action="store_true")
+COMMAND_ARGS = parser.parse_args()
+
 
 @bot.event
 async def on_ready():
+    global COMMAND_ARGS
     load_extensions()
     http_session.connect()
     bot_config.connect(gg_manager.conn)
@@ -29,7 +38,14 @@ async def on_ready():
     waifus.connect(gg_manager.conn)
     waifu_manager.players = players
     waifu_manager.waifus = waifus
-    # waifu_manager.connect(gg_manager.conn)
+
+    if COMMAND_ARGS.maintenance:
+        await bot.change_presence(
+            game=discord.Game(name="Dad's working on me"),
+            status=discord.Status.dnd)
+    else:
+        waifu_manager.connect(gg_manager.conn)
+    
     waifu_commands = bot.get_cog('WaifuCommands')
     await waifu_commands.random_waifu(None)
     await update_messages()
@@ -72,7 +88,8 @@ async def on_message(message):
         return
 
     if bot.user in message.mentions:
-        if message.content.lower().endswith("alright?") and message.author.id == "178887072864665600":
+        if message.content.lower().endswith("alright?") and\
+                message.author.id == "178887072864665600":
             await bot.send_message(message.channel, "Sure, dad.")
         return
 
@@ -101,15 +118,16 @@ async def on_reaction_add(reaction, user):
 
 def is_suggestion(message, user):
     return message.server.name == "MordredBot Dev"\
-            and message.channel.name == "suggestions"\
-            and user.id == '178887072864665600'
+        and message.channel.name == "suggestions"\
+        and user.id == '178887072864665600'
 
 
 @bot.command(pass_context=True)
 async def suggest(ctx, *args):
     suggestion = ' '.join(args)
     description = suggestion
-    embed = discord.Embed(title=ctx.message.author.name, description=description, color=0x0760FA)
+    embed = discord.Embed(title=ctx.message.author.name, description=description,
+                          color=0x0760FA)
     channel = await get_suggestion_channel()
     message = await bot.send_message(channel, embed=embed)
     await bot.add_reaction(message, ':yes_emoji:529842623532367872')
@@ -141,6 +159,35 @@ async def get_commits(ctx):
 async def set_spawn_channel(ctx, channel: discord.Channel):
     bot_config.update_config(channel.id)
     await bot.say("Spawn channel set to {}".format(channel.mention))
+
+
+@bot.command(pass_context=True)
+async def set_game(ctx, *args: str):
+    global LAST_STATUS
+    global LAST_GAME
+    if ctx.message.author.id != "178887072864665600":
+        await bot.say("You're not my dad.")
+    name = ' '.join(args)
+    game = discord.Game(name=name)
+    LAST_GAME = game
+    await bot.change_presence(game=game, status=LAST_STATUS)
+
+
+@bot.command(pass_context=True)
+async def set_status(ctx, status):
+    global LAST_STATUS
+    global LAST_GAME
+    if ctx.message.author.id != "178887072864665600":
+        await bot.say("You're not my dad.")
+    states = {
+        'online': discord.Status.online,
+        'offline': discord.Status.offline,
+        'idle': discord.Status.idle,
+        'dnd': discord.Status.dnd
+    }
+    status = states[status]
+    LAST_STATUS = status
+    await bot.change_presence(status=status, game=LAST_GAME)
 
 
 bot.run(TOKEN)

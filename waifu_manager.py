@@ -1,5 +1,4 @@
 import discord
-import asyncio
 import random
 import math
 
@@ -37,7 +36,8 @@ class WaifuManager:
         player = self.players.players[discord_id]
         if player.get_waifu_list() is not None:
             player.get_waifu_list().append(self.waifus.waifus[waifu_id])
-        self.cur.execute("INSERT INTO player_waifu (player_id, waifu_id) VALUES (%s, %s)", (player_id, waifu_id))
+        self.cur.execute("INSERT INTO player_waifu (player_id, waifu_id) VALUES (%s, %s)",
+                         (player_id, waifu_id))
         self.save()
 
     def load_player_waifu(self):
@@ -151,9 +151,9 @@ class WaifuSpawn:
     def prepare(self):
         initials = self.get_initials()
         embed = discord.Embed(title="Waifu Spawn",
-                                description="A wild waifu appeared.\n`?claim name` to catch them.\n\
-                                Their initials are `{}`".format(initials),
-                                color=0x07FAA2)
+                              description="A wild waifu appeared.\n`?claim name` to \
+                              catch them.\nTheir initials are `{}`".format(initials),
+                              color=0x07FAA2)
         embed._image = {
             'url': str(self.image_url)
         }

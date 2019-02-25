@@ -122,8 +122,8 @@ class WaifuCommands:
         if is_extended:
             embed.add_field(name="Favorites", value=response['member_favorites'])
         embed._image = {
-                'url': str(response['image_url'])
-            }
+            'url': str(response['image_url'])
+        }
         embed.set_footer(text=footer)
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
@@ -323,7 +323,7 @@ class WaifuCommands:
         name = ' '.join(args)
         if self.is_correct_name(name, waifu_manager.current_waifu_spawn.name):
             await self.bot.say(
-                    f"You got it, {ctx.message.author.mention}! (But not really yet.)")
+                f"You got it, {ctx.message.author.mention}! (But not really yet.)")
             waifu_manager.waifu_claimed(ctx.message.author.id)
             claim_message = waifu_manager.claim_message
             old_embed = claim_message.embeds[0]

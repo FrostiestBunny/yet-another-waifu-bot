@@ -1,8 +1,3 @@
-import time
-import psycopg2
-import discord
-
-
 class Players:
 
     def __init__(self):
