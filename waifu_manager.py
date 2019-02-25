@@ -1,4 +1,5 @@
 import discord
+import asyncio
 import random
 import math
 
@@ -40,6 +41,7 @@ class WaifuManager:
         self.save()
 
     def load_player_waifu(self):
+        print("Loading player_waifu")
         self.cur.execute("SELECT player_id, waifu_id FROM player_waifu;")
         query = self.cur.fetchall()
         for row in query:
@@ -48,6 +50,7 @@ class WaifuManager:
             if self.player_waifu.get(discord_id, None) is None:
                 self.player_waifu[discord_id] = []
             self.player_waifu[discord_id].append(int(waifu_id))
+        print("Player_waifu loaded")
 
     def prepare_waifu_spawn(self, waifu_props, pictures):
         mal_id = str(waifu_props['mal_id'])

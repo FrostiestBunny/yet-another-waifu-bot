@@ -210,15 +210,12 @@ class WaifuCommands:
         await self.bot.send_message(ctx.message.channel, embed=embed)
 
     async def random_waifu(self, channel):
-        print("Starting random waifu")
         DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
 
-        if random.randint(0, 99) < -1:
+        if random.randint(0, 99) < 30:
             comicvine = True
-            print("Comicvine")
         else:
             comicvine = False
-            print("Not comicvine")
         if waifu_manager.current_waifu_spawn is not None:
             if timers.get_time() - timers.get_waifu_claim_timer() < WAIFU_CLAIM_DELTA:
                 return
@@ -235,7 +232,6 @@ class WaifuCommands:
             waifu_manager.set_claim_message(message)
             timers.set_waifu_claim_timer()
         while True:
-            print("Trying to find waifu")
             if comicvine:
                 response = await self.get_random_comic_char()
                 if response is not None:
@@ -244,9 +240,7 @@ class WaifuCommands:
                         return
             else:
                 char_id = random.randint(1, 99999)
-                print("got random id")
                 response = await self.get_waifu_by_id(char_id)
-                print("got response")
                 if response is not None:
                     if response['image_url'] != DEFAULT_IMAGE_URL and response['member_favorites'] >= 5:
                         session = http_session.get_connection()
@@ -258,10 +252,8 @@ class WaifuCommands:
 
     async def get_waifu_by_id(self, mal_id):
         session = http_session.get_connection()
-        print("Got session")
         async with session.get(API_URL + "character/{}".format(mal_id)) as resp:
             response = await resp.json()
-        print("Got response in get_waifu_by_id")
         error = response.get('error', None)
         if error is not None:
             return None

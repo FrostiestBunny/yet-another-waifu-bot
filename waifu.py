@@ -11,6 +11,7 @@ class Waifus:
         self.load_waifus()
 
     def load_waifus(self):
+        print("Loading waifus")
         self.cur.execute("SELECT waifu_id, name, nickname, affection, stats,\
                           mal_id, last_interaction, acquired, is_comicvine FROM waifus;")
         query = self.cur.fetchall()
@@ -19,6 +20,7 @@ class Waifus:
             self.waifus[int(waifu_id)] = Waifu(int(waifu_id), str(mal_id), str(name), is_comicvine,
                                                 str(nickname), int(affection), str(stats),
                                                 str(last_interaction), str(acquired))
+        print("waifus loaded")
 
     def add_waifu(self, mal_id, name, is_comicvine):
         mal_id = str(mal_id)
@@ -28,7 +30,7 @@ class Waifus:
                         (name, None, 0, "1:1:1", mal_id, None, is_comicvine))
         self.save()
         waifu_id = self.get_latest_waifu_id(mal_id)
-        self.waifus[waifu_id] = Waifu(waifu_id, mal_id, name)
+        self.waifus[waifu_id] = Waifu(waifu_id, mal_id, name, is_comicvine)
 
     def get_latest_waifu_id(self, mal_id):
         self.cur.execute("SELECT waifu_id FROM waifus WHERE mal_id=%s ORDER BY acquired DESC LIMIT 1;", (mal_id,))

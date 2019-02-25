@@ -31,13 +31,13 @@ class Players:
         self.cur.execute("INSERT INTO players (id, currency, won_fights, lost_fights)\
                           VALUES (%s, %s, %s, %s)", (_id, 0, 0, 0))
         self.save()
-    
+
     def get_player_id(self, discord_id):
         self.cur.execute("SELECT player_id FROM players WHERE id=%s;", (discord_id,))
         query = self.cur.fetchone()
         player_id = query[0]
         return int(player_id)
-    
+
     def get_player_by_id(self, player_id):
         self.cur.execute("SELECT id FROM players WHERE player_id=%s;", (player_id,))
         query = self.cur.fetchone()
