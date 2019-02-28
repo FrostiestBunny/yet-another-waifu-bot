@@ -516,10 +516,11 @@ class WaifuCommands:
             filters = {
                 "name": content[i:]
             }
-        try:
-            page = int(args[0])
-        except IndexError:
-            page = 1
+        else:
+            try:
+                page = int(args[0])
+            except IndexError:
+                page = 1
         if page < 1:
             return
         author = ctx.message.author
