@@ -134,7 +134,7 @@ class WaifuManager:
     
     def filter_waifus(self, waifu):
         name = self.waifu_filters['name']
-        return name in waifu
+        return name in waifu.name
 
     async def _get_player_waifu_list(self, player):
         waifus = []
