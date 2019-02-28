@@ -118,7 +118,9 @@ class WaifuManager:
         if start >= len(waifus):
             return
         end = offset * page
-        for n, waifu in reversible_list[start:end]:
+        if filters is None:
+            reversible_list = reversible_list[start:end]
+        for n, waifu in reversible_list:
             message += str(n)
             message += " | "
             message += waifu.name
