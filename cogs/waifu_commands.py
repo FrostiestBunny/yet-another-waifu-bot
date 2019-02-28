@@ -520,10 +520,8 @@ class WaifuCommands:
         else:
             try:
                 page = int(args[0])
-                print("here")
             except IndexError:
                 page = 1
-                print("Error")
         if page < 1:
             return
         author = ctx.message.author
