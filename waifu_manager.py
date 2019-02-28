@@ -15,6 +15,7 @@ class WaifuManager:
         self.prepared_waifu_spawn = None
         self.is_prepared = False
         self.claim_message = None
+        self.waifu_filters = None
 
     def connect(self, conn):
         self.conn = conn
@@ -97,13 +98,19 @@ class WaifuManager:
             waifu = None
         return waifu
 
-    async def get_player_waifus(self, discord_id, name, page):
+    async def get_player_waifus(self, discord_id, name, page, filters):
         waifus = []
         if self.player_waifu.get(discord_id, None) is None:
             return None
 
         player = self.players.players[discord_id]
         waifus = await self._get_player_waifu_list(player)
+        enumeration = enumerate(waifus)
+        reversible_list = [(a, b) for a, b in enumeration]
+        reversible_list.reverse()
+        if filters is not None:
+            self.waifu_filters = filters
+            reversible_list = filter(self.filter_waifus, reversible_list)
         message = ""
         offset = 20
         start = offset * (page - 1)
@@ -111,9 +118,6 @@ class WaifuManager:
         if start >= len(waifus):
             return
         end = offset * page
-        enumeration = enumerate(waifus)
-        reversible_list = [(a, b) for a, b in enumeration]
-        reversible_list.reverse()
         for n, waifu in reversible_list[start:end]:
             message += str(n)
             message += " | "
@@ -125,6 +129,10 @@ class WaifuManager:
         embed = discord.Embed(title=title, description=message, color=0xB346D8)
         embed.set_footer(text=footer)
         return embed
+    
+    def filter_waifus(self, waifu):
+        name = self.waifu_filters['name']
+        return name in waifu
 
     async def _get_player_waifu_list(self, player):
         waifus = []

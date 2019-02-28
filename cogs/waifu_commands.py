@@ -506,11 +506,28 @@ class WaifuCommands:
         await self.bot.edit_message(claim_message, embed=embed)
 
     @command(pass_context=True, name='list')
-    async def waifu_list(self, ctx: Context, page: int = 1):
+    async def waifu_list(self, ctx: Context, *args):
+        page = 1
+        content = ctx.message.content
+        filters = None
+        if "-name" in content:
+            i = content.index("-name")
+            i += 6
+            filters = {
+                "name": content[i:]
+            }
+            print(filters)
+        else:
+            try:
+                page = int(args[0])
+                print("here")
+            except IndexError:
+                page = 1
+                print("Error")
         if page < 1:
             return
         author = ctx.message.author
-        embed = await waifu_manager.get_player_waifus(author.id, author.name, page)
+        embed = await waifu_manager.get_player_waifus(author.id, author.name, page, filters)
         if embed is None:
             await self.bot.say("No waifus, that's pretty sad.")
             return
