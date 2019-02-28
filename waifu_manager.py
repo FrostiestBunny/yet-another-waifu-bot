@@ -111,6 +111,7 @@ class WaifuManager:
         if filters is not None:
             self.waifu_filters = filters
             reversible_list = filter(self.filter_waifus, reversible_list)
+            footer = ""
         message = ""
         offset = 20
         start = offset * (page - 1)
@@ -120,14 +121,19 @@ class WaifuManager:
         end = offset * page
         if filters is None:
             reversible_list = reversible_list[start:end]
+            footer = "Page {} of {}".format(page, max_pages)
+        i = 0
         for n, waifu in reversible_list:
+            if i > 25:
+                footer = "Some results were omitted, use a more specific search."
+                break
             message += str(n)
             message += " | "
             message += waifu.name
             message += " | Affection: {}".format(waifu.affection)
             message += "\n"
+            i += 1
         title = "{}'s waifus (page {}):".format(name, page)
-        footer = "Page {} of {}".format(page, max_pages)
         embed = discord.Embed(title=title, description=message, color=0xB346D8)
         embed.set_footer(text=footer)
         return embed
