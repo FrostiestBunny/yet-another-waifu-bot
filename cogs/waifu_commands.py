@@ -132,12 +132,13 @@ class WaifuCommands:
         args = list(args)
         author = ctx.message.author
         r_map = {
-            "0": "0⃣",
-            "1": "1⃣",
-            "2": "2⃣",
-            "3": "3⃣",
-            "4": "4⃣",
-            "5": "5⃣"
+            0: "0⃣",
+            1: "1⃣",
+            2: "2⃣",
+            3: "3⃣",
+            4: "4⃣",
+            5: "5⃣",
+            "cancel": "⏹"
         }
         
         name = ' '.join(args)
@@ -149,15 +150,14 @@ class WaifuCommands:
                             value=f"Real name: {character['real_name']}",
                             inline=False)
         msg = await self.bot.send_message(ctx.message.channel, embed=embed)
-        await self.bot.add_reaction(msg, r_map["1"])
-        await self.bot.add_reaction(msg, r_map["2"])
-        await self.bot.add_reaction(msg, r_map["3"])
-        await self.bot.add_reaction(msg, r_map["4"])
-        await self.bot.add_reaction(msg, r_map["5"])
+
+        for i in range(len(response['results'])):
+            await self.bot.add_reaction(msg, r_map[i + 1])
+        await self.bot.add_reaction(msg, "⏹")
 
         def check(reaction, user):
             e = str(reaction.emoji)
-            return e.startswith(('1⃣', '2⃣', '3⃣', '4⃣', '5⃣')) and user.id == author.id
+            return e.startswith(('1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '⏹')) and user.id == author.id
 
         res = await self.bot.wait_for_reaction(message=msg, check=check, timeout=60)
         await self.bot.delete_message(msg)
@@ -167,8 +167,12 @@ class WaifuCommands:
         choice = None
         for k, v in r_map.items():
             if v == res.reaction.emoji:
-                choice = int(k)
+                choice = k
                 break
+        
+        if choice == "cancel":
+            return
+
         url = response['results'][choice - 1]['api_detail_url']
         session = http_session.get_connection()
         params = {
@@ -180,7 +184,7 @@ class WaifuCommands:
             response = await resp.json()
         
         character = response["results"]
-        embed = discord.Embed(title=f"**{character['name']}**", color=0x09d3e3,
+        embed = discord.Embed(title=f"{character['name']}", color=0x09d3e3,
                               url=character['site_detail_url'])
         embed._image = {
             'url': character['image']['medium_url']
