@@ -9,7 +9,6 @@ import itertools
 from difflib import SequenceMatcher
 from timers import timers
 import os
-import json
 
 
 WAIFU_CLAIM_DELTA = 60
@@ -131,40 +130,34 @@ class WaifuCommands:
     @command(pass_context=True)
     async def cinfo(self, ctx: Context, *args: str):
         args = list(args)
-        is_extended = False
         author = ctx.message.author
         r_map = {
             "0": "0⃣",
             "1": "1⃣",
             "2": "2⃣",
             "3": "3⃣",
-            "4": "4⃣"
+            "4": "4⃣",
+            "5": "5⃣"
         }
-
-        if args[-1].startswith('-extended'):
-            is_extended = True
-            del args[-1]
-        else:
-            footer = "Use ?cinfo name -extended to view extended description."
         
         name = ' '.join(args)
         response = await self.find_comicvine_char(name)
         
         embed = discord.Embed(title=name.capitalize(), color=0x09d3e3)
         for i, character in enumerate(response['results']):
-            embed.add_field(name=f"{i}: **{character['name']}**",
+            embed.add_field(name=f"{i+1}: **{character['name']}**",
                             value=f"Real name: {character['real_name']}",
                             inline=False)
         msg = await self.bot.send_message(ctx.message.channel, embed=embed)
-        await self.bot.add_reaction(msg, r_map["0"])
         await self.bot.add_reaction(msg, r_map["1"])
         await self.bot.add_reaction(msg, r_map["2"])
         await self.bot.add_reaction(msg, r_map["3"])
         await self.bot.add_reaction(msg, r_map["4"])
+        await self.bot.add_reaction(msg, r_map["5"])
 
         def check(reaction, user):
             e = str(reaction.emoji)
-            return e.startswith(('0⃣', '1⃣', '2⃣', '3⃣', '4⃣')) and user.id == author.id
+            return e.startswith(('1⃣', '2⃣', '3⃣', '4⃣', '5⃣')) and user.id == author.id
 
         res = await self.bot.wait_for_reaction(message=msg, check=check, timeout=60)
         await self.bot.delete_message(msg)
@@ -176,7 +169,7 @@ class WaifuCommands:
             if v == res.reaction.emoji:
                 choice = int(k)
                 break
-        url = response['results'][choice]['api_detail_url']
+        url = response['results'][choice - 1]['api_detail_url']
         session = http_session.get_connection()
         params = {
             'api_key': COMICVINE_API_KEY,
@@ -195,6 +188,12 @@ class WaifuCommands:
         embed.add_field(name="Real name", value=character['real_name'], inline=False)
         embed.add_field(name="Description", value=character['deck'], inline=False)
         await self.bot.send_message(ctx.message.channel, embed=embed)
+
+    @command(pass_context=True)
+    async def get_emoji(self, ctx: Context, id: str):
+        msg = await self.bot.get_message(ctx.message.channel, id)
+        for r in msg.reactions:
+            print(r.emoji)
 
     async def find_comicvine_char(self, name):
         session = http_session.get_connection()
