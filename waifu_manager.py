@@ -152,7 +152,8 @@ class WaifuSpawn:
         initials = self.get_initials()
         embed = discord.Embed(title="Waifu Spawn",
                               description="A wild waifu appeared.\n`?claim name` to \
-                              catch them.\nTheir initials are `{}`".format(initials),
+                              catch them.\nTheir initials are `{}`\nClick [here]({}) \
+                              if the image doesn't load.".format(initials, self.image_url),
                               color=0x07FAA2)
         embed._image = {
             'url': str(self.image_url)
