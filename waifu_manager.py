@@ -47,9 +47,9 @@ class WaifuManager:
         player = self.players.players[discord_id]
         if player.get_waifu_list() is not None:
             player.get_waifu_list().remove(waifu)
-        self.waifus.remove_waifu(waifu.waifu_id)
         self.cur.execute("DELETE FROM player_waifu WHERE waifu_id=%s", (waifu.waifu_id,))
         self.save()
+        self.waifus.remove_waifu(waifu.waifu_id)
 
     def load_player_waifu(self):
         print("Loading player_waifu")
