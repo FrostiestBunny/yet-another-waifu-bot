@@ -596,7 +596,10 @@ class WaifuCommands:
         compliment = response["compliment"].capitalize() + "."
         await self.bot.say("{}\n{}".format(member.mention, compliment))
         if member.id == self.bot.user.id:
-            await self.bot.say("Wow, thank you, {}!".format(ctx.message.author.mention))
+            if ctx.message.author.id == "266639261523116053":
+                await self.bot.say("*blushes*\nThanks Newt! ❤")
+            else:
+                await self.bot.say("Wow, thank you, {}!".format(ctx.message.author.mention))
 
     @command(pass_context=True)
     async def say(self, ctx: Context, channel_id: str, *args: str):
