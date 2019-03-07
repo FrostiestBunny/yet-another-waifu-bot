@@ -31,6 +31,11 @@ class Waifus:
         self.save()
         waifu_id = self.get_latest_waifu_id(mal_id)
         self.waifus[waifu_id] = Waifu(waifu_id, mal_id, name, is_comicvine)
+    
+    def remove_waifu(self, waifu_id):
+        del self.waifus[waifu_id]
+        self.cur.execute("DELETE FROM waifus WHERE waifu_id=%s", (waifu_id,))
+        self.save()
 
     def get_latest_waifu_id(self, mal_id):
         self.cur.execute(

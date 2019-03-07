@@ -40,6 +40,16 @@ class WaifuManager:
         self.cur.execute("INSERT INTO player_waifu (player_id, waifu_id) VALUES (%s, %s)",
                          (player_id, waifu_id))
         self.save()
+    
+    async def remove_waifu_from_player(self, discord_id, list_id):
+        waifu = await self.get_player_waifu(discord_id, list_id)
+        self.player_waifu[discord_id].remove(waifu.waifu_id)
+        player = self.players.players[discord_id]
+        if player.get_waifu_list() is not None:
+            player.get_waifu_list().remove(waifu.waifu_id)
+        self.waifus.remove_waifu(waifu.waifu_id)
+        self.cur.execute("DELETE FROM player_waifu WHERE waifu_id=%s", (waifu.waifu_id,))
+        self.save()
 
     def load_player_waifu(self):
         print("Loading player_waifu")

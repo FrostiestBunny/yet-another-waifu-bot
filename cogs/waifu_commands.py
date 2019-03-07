@@ -632,6 +632,16 @@ class WaifuCommands:
             'url': waifu_data['image_url']
         }
         await self.bot.send_message(ctx.message.channel, embed=embed)
+    
+    @command(pass_context=True)
+    async def remove(self, ctx: Context, list_id: int):
+        author = ctx.message.author
+        waifu = await waifu_manager.get_player_waifu(author.id, list_id)
+        if waifu is None:
+            await self.bot.say(f"No waifu with id {list_id}")
+            return
+        await waifu_manager.remove_waifu_from_player(author.id, list_id)
+        await self.bot.say(f"Successfully removed {waifu.name} from your waifus.")
 
 
 def setup(bot):
