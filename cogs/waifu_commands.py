@@ -1,5 +1,5 @@
 import discord
-from discord.ext.commands import command, Context
+from discord.ext.commands import command, Context, group
 import asyncio
 import random
 from player import players
@@ -22,6 +22,8 @@ class WaifuCommands:
 
     def __init__(self, bot):
         self.bot = bot
+        self.current_trades = {}
+        self.waiting_to_trade = []
 
     async def find_mal(self, kind, name, limit):
         response = ""
@@ -642,6 +644,75 @@ class WaifuCommands:
             return
         await waifu_manager.remove_waifu_from_player(author.id, list_id)
         await self.bot.say(f"Successfully removed {waifu.name} from your waifus.")
+    
+    @group(pass_context=True, aliases=['t'])
+    async def trade(self, ctx: Context):
+        if ctx.invoked_subcommand is None:
+            await self.bot.say("Use ?help trade to see available trading commands.")
+    
+    @trade.command(pass_context=True, name="start", aliases=['s'])
+    async def trade_start(self, ctx: Context, member: discord.Member):
+        author = ctx.message.author
+        # if author.id == member.id:
+        #     await self.bot.say("You can't trade with yourself, dummy.")
+        #     return
+        if member.bot:
+            await self.bot.say("Can't trade with bots, mate.")
+            return
+        if author.id in self.current_trades or author.id in self.waiting_to_trade:
+            await self.bot.say("You're already trading with someone.")
+            return
+        if member.id in self.current_trades or member.id in self.waiting_to_trade:
+            await self.bot.say("They're already trading with someone.")
+            return
+        self.waiting_to_trade.append(author.id)
+        self.waiting_to_trade.append(member.id)
+        await self.bot.say(f"{member.mention}, {author.mention} wants to trade with you. " +
+                           "Say 'yes' to accept, 'no' to decline.")
+        msg = await self.bot.wait_for_message(author=member, channel=ctx.message.channel,
+                                              check=self.check_trade_message,
+                                              timeout=120)
+        self.waiting_to_trade.remove(author.id)
+        self.waiting_to_trade.remove(member.id)
+        if msg is None:
+            await self.bot.say(f"{author.mention}, it seems that {member.mention} is asleep.")
+            return                     
+        if msg.content.lower() == "no":
+            await self.bot.say(
+                f"{member.name} doesn't want to trade with you, {author.mention}. " +
+                "Too bad.")
+            return
+        
+        trade = WaifuTrade(author, member)
+        self.current_trades[author.id] = trade
+        self.current_trades[member.id] = trade
+        embed = discord.Embed(title="Trade", color=0x0934e3)
+        embed.add_field(name=f"{author.name}'s offer:", value="Nothing.", inline=False)
+        embed.add_field(name=f"{member.name}'s offer:", value="Nothing.", inline=False)
+        embed_msg = await self.bot.send_message(ctx.message.channel, embed=embed)
+        trade.set_embed_msg(embed_msg)
+    
+    
+    def check_trade_message(self, msg):
+        return msg.content.lower() == "yes" or msg.content.lower() == "no"
+
+
+class WaifuTrade:
+
+    def __init__(self, t1_member, t2_member):
+        self.t1_member = t1_member
+        self.t2_member = t2_member
+        self.embed_msg = None
+        self.t1_confirmed = False
+        self.t2_confirmed = False
+        self.t1_offer = None
+        self.t2_offer = None
+    
+    def set_embed_msg(self, embed_msg):
+        self.embed_msg = embed_msg
+
+    def get_embed_msg(self):
+        return self.embed_msg
 
 
 def setup(bot):

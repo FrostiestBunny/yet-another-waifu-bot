@@ -137,17 +137,14 @@ async def suggest(ctx, *args):
 async def get_commits(ctx):
     response = await github_api.get_commits()
     message = ""
-    counter = 0
+    response = response[:10]
     for row in response:
-        if counter == 5:
-            break
         commit_author = row['commit']['author']['name']
         commit_message = row['commit']['message']
         message += "**" + commit_author + "**"
         message += ":\n"
         message += commit_message
         message += "\n\n"
-        counter += 1
 
     embed = discord.Embed(title="Commits:", description=message, color=0x27F0DE)
     await bot.send_message(ctx.message.channel, embed=embed)
@@ -165,6 +162,7 @@ async def set_game(ctx, *args: str):
     global LAST_GAME
     if ctx.message.author.id != "178887072864665600":
         await bot.say("You're not my dad.")
+        return
     name = ' '.join(args)
     game = discord.Game(name=name)
     LAST_GAME = game
@@ -177,6 +175,7 @@ async def set_status(ctx, status):
     global LAST_GAME
     if ctx.message.author.id != "178887072864665600":
         await bot.say("You're not my dad.")
+        return
     states = {
         'online': discord.Status.online,
         'offline': discord.Status.offline,
