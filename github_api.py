@@ -26,6 +26,7 @@ async def create_card(body):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=payload, params=params, headers=headers) as resp:
             response = await resp.json()
+    return response
 
 
 async def get_commits():

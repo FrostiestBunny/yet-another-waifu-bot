@@ -1,6 +1,5 @@
 import discord
 from discord.ext.commands import command, Context
-import random
 import aiohttp
 from http_session import http_session
 
@@ -34,15 +33,17 @@ class BotCommands:
             if message_limit is not None and message_counter == message_limit:
                 break
         if message_counter == 0:
-            await self.bot.say("{} didn't say anything in the last {} messages.".format(user.name, message_counter))
+            await self.bot.say(
+                f"{user.name} didn't say anything in the last {message_counter} messages.")
             return
 
         if word_counter == 0:
             await self.bot.say("{} didn't mention the word even once.".format(user.name))
             return
         ratio = word_counter / message_counter
-        await self.bot.say("{}'s ratio of {} per message in the last {} messages is:\n {:.2f}".format(
-            user.name, word, message_counter, ratio))
+        await self.bot.say(
+            "{}'s ratio of {} per message in the last {} messages is:\n {:.2f}".format(
+                user.name, word, message_counter, ratio))
 
     @command(pass_context=True)
     async def dismiss(self, ctx: Context):

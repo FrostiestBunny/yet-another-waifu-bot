@@ -1,5 +1,4 @@
 import time
-import psycopg2
 
 
 class People:

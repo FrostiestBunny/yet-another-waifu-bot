@@ -457,9 +457,9 @@ class WaifuCommands:
             perm = perm.split(' ')
             result = 0
             groups = self.split_into_groups(list(itertools.product(perm, guess)), len(perm))
-            for group in groups:
+            for gr in groups:
                 min_group_result = 99999
-                for words in group:
+                for words in gr:
                     if words[0][0] != words[1][0]:
                         continue
                     mid_result = await self.calculate_word_similarity(words[1], words[0])
@@ -694,7 +694,6 @@ class WaifuCommands:
         embed.add_field(name=f"{member.name}'s offer:", value="Nothing.", inline=False)
         embed_msg = await self.bot.send_message(ctx.message.channel, embed=embed)
         trade.set_embed_msg(embed_msg)
-    
     
     def check_trade_message(self, msg):
         return msg.content.lower() == "yes" or msg.content.lower() == "no"
