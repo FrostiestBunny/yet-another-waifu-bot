@@ -2,17 +2,27 @@ import os
 import psycopg2
 import urllib.parse as urlparse
 
-DB_TOKEN = os.getenv("HEROKU_POSTGRESQL_SILVER_URL")
-
-urlparse.uses_netloc.append("postgres")
-url = urlparse.urlparse(DB_TOKEN)
-
 
 class GGManager:
 
     def __init__(self):
-        global url
         self.ggs_data = {}
+        self.conn = None
+        # self.cur = self.conn.cursor()
+        # self.cur.execute("SELECT * FROM users;")
+        # query = self.cur.fetchall()
+        # for row in query:
+        #     _id, ggs, username = row
+        #     self.ggs_data[str(_id)] = {'name': str(username), 'ggs': int(ggs)}
+
+    def connect(self, maint):
+        if not maint:
+            DB_TOKEN = os.getenv("HEROKU_POSTGRESQL_SILVER_URL")
+        else:
+            DB_TOKEN = os.getenv("DATABASE_URL")
+        urlparse.uses_netloc.append("postgres")
+        url = urlparse.urlparse(DB_TOKEN)
+
         self.conn = psycopg2.connect(
             database=url.path[1:],
             user=url.username,
@@ -20,12 +30,6 @@ class GGManager:
             host=url.hostname,
             port=url.port
         )
-        self.cur = self.conn.cursor()
-        # self.cur.execute("SELECT * FROM users;")
-        # query = self.cur.fetchall()
-        # for row in query:
-        #     _id, ggs, username = row
-        #     self.ggs_data[str(_id)] = {'name': str(username), 'ggs': int(ggs)}
 
     def save(self):
         self.conn.commit()

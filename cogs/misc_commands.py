@@ -1,16 +1,33 @@
 import discord
-from discord.ext.commands import command, Context
+from discord.ext.commands import Cog, Context, command
+from my_bot import MyBot
 from io import BytesIO
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 
-class ImageFun:
-
-    def __init__(self, bot):
+class MiscCommands(Cog, name="Misc Commands"):
+    
+    def __init__(self, bot: MyBot):
         self.bot = bot
 
-    @command(pass_context=True)
+    @command()
+    async def suggest(self, ctx: Context, *args):
+        suggestion = ' '.join(args)
+        description = suggestion
+        embed = discord.Embed(title=ctx.message.author.name, description=description,
+                            color=0x0760FA)
+        channel = await self.bot.get_suggestion_channel()
+        message = await channel.send(embed=embed)
+        await message.add_reaction(':yes_emoji:529842623532367872')
+        await message.add_reaction(':no_emoji:529843815415021587')
+        await ctx.message.add_reaction('👌')
+    
+    @command()
+    async def gib_code(self, ctx: Context):
+        await ctx.send("https://github.com/ZackUnfair/yet-another-waifu-bot")
+    
+    @command()
     async def uwot(self, ctx: Context, member: discord.Member, *args):
         author = ctx.message.author
         url = member.avatar_url
@@ -49,10 +66,11 @@ class ImageFun:
         output = BytesIO()
         out.save(output, format="PNG")
         output.seek(0)
-        await self.bot.send_file(ctx.message.channel, fp=output, filename="uwot.png")
+        f = discord.File(output, 'uwot.png')
+        await ctx.send(file=f)
         output.close()
 
 
-def setup(bot):
-    cog = ImageFun(bot)
-    bot.add_cog(cog)
+def setup(bot: MyBot):
+    c = MiscCommands(bot)
+    bot.add_cog(c)
