@@ -54,14 +54,16 @@ class WaifuManager:
     async def trade_waifus(self, t1_discord_id, t1_list_id, t2_discord_id, t2_list_id):
         t1_waifu = await self.get_player_waifu(t1_discord_id, t1_list_id)
         t2_waifu = await self.get_player_waifu(t2_discord_id, t2_list_id)
-
-        self.add_waifu_to_player(t2_waifu.mal_id, t2_waifu.name, t2_waifu.is_comicvine,
-                                 t1_discord_id)
-        self.add_waifu_to_player(t1_waifu.mal_id, t1_waifu.name, t1_waifu.is_comicvine,
+        if t2_waifu is not None:
+            self.add_waifu_to_player(t2_waifu.mal_id, t2_waifu.name, t2_waifu.is_comicvine,
+                                    t1_discord_id)
+        if t1_waifu is not None:
+            self.add_waifu_to_player(t1_waifu.mal_id, t1_waifu.name, t1_waifu.is_comicvine,
                                  t2_discord_id)
-        
-        await self.remove_waifu_from_player(t1_discord_id, t1_list_id)
-        await self.remove_waifu_from_player(t2_discord_id, t2_list_id)
+        if t1_waifu is not None:
+            await self.remove_waifu_from_player(t1_discord_id, t1_list_id)
+        if t2_waifu is not None:
+            await self.remove_waifu_from_player(t2_discord_id, t2_list_id)
 
     def load_player_waifu(self):
         print("Loading player_waifu")
@@ -117,6 +119,8 @@ class WaifuManager:
         try:
             waifu = waifu_list[list_id]
         except IndexError:
+            waifu = None
+        except TypeError:
             waifu = None
         return waifu
 

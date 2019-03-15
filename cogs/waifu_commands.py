@@ -25,7 +25,6 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         self.bot = bot
         self.current_trades = {}
         self.waiting_to_trade = []
-        self.trade_check_id = None
 
     async def find_mal(self, kind, name, limit):
         response = ""
@@ -621,7 +620,7 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         author = ctx.message.author
         waifu = await waifu_manager.get_player_waifu(str(author.id), list_id)
         if waifu is None:
-            await ctx.send(f"No waifu with id {list_id}")
+            await ctx.send(f"No waifu with id {list_id}.")
             return
         waifu_data = await self.get_waifu_by_id(waifu.mal_id)
         desc = "More info soon"
@@ -648,10 +647,11 @@ class WaifuCommands(Cog, name="Waifu Commands"):
     
     @trade.command(name="start", aliases=['s'])
     async def trade_start(self, ctx: Context, member: discord.Member):
+        """Start trading with another user."""
         author = ctx.message.author
-        # if author.id == member.id:
-        #     await ctx.send("You can't trade with yourself, dummy.")
-        #     return
+        if author.id == member.id:
+            await ctx.send("You can't trade with yourself, dummy.")
+            return
         if member.bot:
             await ctx.send("Can't trade with bots, mate.")
             return
@@ -665,9 +665,14 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         self.waiting_to_trade.append(member.id)
         await ctx.send(f"{member.mention}, {author.mention} wants to trade with you. " +
                            "Say 'yes' to accept, 'no' to decline.")
-        self.trade_check_id = member.id
+
+        def check_trade_message(msg):
+            return msg.content.lower() == "yes" or msg.content.lower() == "no"\
+                and msg.author.id == member.id\
+                    and msg.channel.id == ctx.message.channel.id
+
         try:
-            msg = await self.bot.wait_for('message', check=self.check_trade_message, timeout=120)
+            msg = await self.bot.wait_for('message', check=check_trade_message, timeout=120)
         except asyncio.TimeoutError:
             self.waiting_to_trade.remove(author.id)
             self.waiting_to_trade.remove(member.id)
@@ -690,8 +695,9 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         embed_msg = await ctx.send(embed=embed)
         trade.set_embed_msg(embed_msg)
     
-    @trade.command(name="cancel", aliases=['c'])
+    @trade.command(name="cancel", aliases=['cl'])
     async def trade_cancel(self, ctx: Context):
+        """Cancel your current trade."""
         author = ctx.message.author
         if author.id not in self.current_trades:
             await ctx.send("No active trade to cancel.")
@@ -704,9 +710,59 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         del self.current_trades[member.id]
         await ctx.send("Cancelled trade.")
     
-    def check_trade_message(self, msg):
-        return msg.content.lower() == "yes" or msg.content.lower() == "no"\
-            and msg.author.id == self.trade_check_id
+    @trade.command(name="add", aliases=['a'])
+    async def trade_add_offer(self, ctx: Context, list_id: int):
+        """Add a waifu offer to your trade."""
+        author = ctx.message.author
+        if author.id not in self.current_trades:
+            await ctx.send("You're not trading with anyone right now.")
+            return
+        waifu = await waifu_manager.get_player_waifu(str(author.id), list_id)
+        if waifu is None:
+            await ctx.send(f"No waifu with id {list_id}.")
+            return
+        trade = self.current_trades[author.id]
+        embed_msg = trade.get_embed_msg()
+        embed = embed_msg.embeds[0]
+        if trade.t1_member.id == author.id:
+            trade.set_t1_offer(waifu)
+            trade.set_t1_list_id(list_id)
+            embed.set_field_at(0, name=f"{author.name}'s offer:", value=f"{waifu.name}", inline=False)
+        else:
+            trade.set_t2_offer(waifu)
+            trade.set_t2_list_id(list_id)
+            embed.set_field_at(1, name=f"{author.name}'s offer:", value=f"{waifu.name}", inline=False)
+        await embed_msg.edit(embed=embed)
+    
+    @trade.command(name="confirm", aliases=['c'])
+    async def trade_confirm(self, ctx: Context):
+        """Confirm your trade."""
+        author = ctx.message.author
+        if author.id not in self.current_trades:
+            await ctx.send("You're not trading with anyone right now.")
+            return
+        trade = self.current_trades[author.id]
+        embed_msg = trade.get_embed_msg()
+        embed = embed_msg.embeds[0]
+        if trade.t1_member.id == author.id:
+            trade.t1_confirmed = True
+            prev_field = embed.fields[0]
+            embed.set_field_at(0, name=f"{prev_field.name} ✅", value=prev_field.value, inline=prev_field.inline)
+        else:
+            trade.t2_confirmed = True
+            prev_field = embed.fields[1]
+            embed.set_field_at(1, name=f"{prev_field.name} ✅", value=prev_field.value, inline=prev_field.inline)
+        await embed_msg.edit(embed=embed)
+        if trade.t1_confirmed and trade.t2_confirmed:
+            await self.finalize_trade(trade)
+            await ctx.send(f"Finalized trade between {trade.t1_member.mention} and {trade.t2_member.mention}.")
+    
+    async def finalize_trade(self, trade):
+        t1_member = trade.t1_member
+        t2_member = trade.t2_member
+        await waifu_manager.trade_waifus(str(t1_member.id), trade.t1_list_id, str(t2_member.id), trade.t2_list_id)
+        del self.current_trades[t1_member.id]
+        del self.current_trades[t2_member.id]
 
 
 class WaifuTrade:
@@ -719,12 +775,26 @@ class WaifuTrade:
         self.t2_confirmed = False
         self.t1_offer = None
         self.t2_offer = None
+        self.t1_list_id = None
+        self.t2_list_id = None
     
     def set_embed_msg(self, embed_msg):
         self.embed_msg = embed_msg
 
     def get_embed_msg(self):
         return self.embed_msg
+    
+    def set_t1_offer(self, offer):
+        self.t1_offer = offer
+    
+    def set_t2_offer(self, offer):
+        self.t2_offer = offer
+    
+    def set_t1_list_id(self, list_id):
+        self.t1_list_id = list_id
+    
+    def set_t2_list_id(self, list_id):
+        self.t2_list_id = list_id
 
 
 def setup(bot: MyBot):
