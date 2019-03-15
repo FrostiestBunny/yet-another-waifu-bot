@@ -420,7 +420,7 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             result = await self.calculate_similarity(
                 name, waifu_manager.current_waifu_spawn.name)
             if result > 5:
-                await self.bot.add_reaction(ctx.message, '❌')
+                await ctx.message.add_reaction('❌')
             else:
                 await ctx.send(
                     "You were off by {} letter{}.".format(result, 's' if result > 1 else ''))
