@@ -10,6 +10,8 @@ class OwnerOnly(Cog, name="Owner Commands"):
     
     def __init__(self, bot: MyBot):
         self.bot = bot
+        self.last_game = discord.Game("")
+        self.last_status = discord.Status.online
     
     async def cog_command_error(self, ctx: Context, error):
         if isinstance(error, NotOwner):
@@ -52,6 +54,28 @@ class OwnerOnly(Cog, name="Owner Commands"):
         msg = ' '.join(args)
         if ctx.message.author.id == 178887072864665600:
             await channel.send(msg)
+    
+    @command()
+    async def set_game(self, ctx: Context, *args):
+        game_name = ' '.join(args)
+        game = discord.Game(game_name)
+        self.last_game = game
+        await self.bot.change_presence(activity=game, status=self.last_status)
+    
+    @command()
+    async def set_status(self, ctx: Context, status: str):
+        states = {
+            'online': discord.Status.online,
+            'offline': discord.Status.offline,
+            'idle': discord.Status.idle,
+            'dnd': discord.Status.dnd
+        }
+        status = states.get(status, None)
+        if status is None:
+            await ctx.send("Uh, are you sure you're not going senile?")
+            return
+        self.last_status = status
+        await self.bot.change_presence(activity=self.last_game, status=status)
 
 
 def setup(bot: MyBot):
