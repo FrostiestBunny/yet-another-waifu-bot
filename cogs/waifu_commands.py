@@ -339,10 +339,7 @@ class WaifuCommands(Cog, name="Waifu Commands"):
                 if response is not None:
                     if response['image_url'] != DEFAULT_IMAGE_URL and\
                             response['member_favorites'] >= 5:
-                        session = http_session.get_connection()
-                        async with session.get(
-                                API_URL + f"character/{response['mal_id']}/pictures") as resp:
-                            pictures = await resp.json()
+                        pictures = await self.get_mal_waifu_pics(response['mal_id'])
                         waifu_manager.prepare_waifu_spawn(response, pictures['pictures'])
                         return
                 await asyncio.sleep(3)
@@ -355,6 +352,13 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         if error is not None:
             return None
         return response
+    
+    async def get_mal_waifu_pics(self, mal_id):
+        session = http_session.get_connection()
+        async with session.get(
+                API_URL + f"character/{mal_id}/pictures") as resp:
+            pictures = await resp.json()
+        return pictures
 
     async def get_random_comic_char(self):
         global COMICVINE_TOTAL_CHARS
@@ -427,7 +431,9 @@ class WaifuCommands(Cog, name="Waifu Commands"):
 
     def is_correct_name(self, guess, target):
         guess = guess.lower()
+        guess = guess.strip()
         target = target.lower()
+        target = target.strip()
         guess = guess.split(' ')
         target = target.split(' ')
         for word in target:
@@ -437,8 +443,10 @@ class WaifuCommands(Cog, name="Waifu Commands"):
 
     async def calculate_similarity(self, guess, target):
         guess = guess.lower()
+        guess = guess.strip()
         guess = guess.split(' ')
         target = target.lower()
+        target = target.strip()
         target = target.split(' ')
         if len(target) != len(guess):
             return 99

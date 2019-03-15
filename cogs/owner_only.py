@@ -3,6 +3,8 @@ from discord.ext.commands import Cog, Context, NotOwner, command
 from my_bot import MyBot
 from player import players
 from bot_config import bot_config
+from waifu_manager import waifu_manager
+from timers import timers
 import aiohttp
 
 
@@ -76,6 +78,17 @@ class OwnerOnly(Cog, name="Owner Commands"):
             return
         self.last_status = status
         await self.bot.change_presence(activity=self.last_game, status=status)
+    
+    @command()
+    async def cheat_spawn(self, ctx: Context, waifu_id: int):
+        waifu_commands = self.bot.get_cog("Waifu Commands")
+        response = await waifu_commands.get_waifu_by_id(waifu_id)
+        pictures = await waifu_commands.get_mal_waifu_pics(waifu_id)
+        waifu_manager.prepare_waifu_spawn(response, pictures['pictures'])
+        embed = waifu_manager.spawn_waifu()
+        message = await ctx.send(embed=embed)
+        waifu_manager.set_claim_message(message)
+        timers.set_waifu_claim_timer()
 
 
 def setup(bot: MyBot):
