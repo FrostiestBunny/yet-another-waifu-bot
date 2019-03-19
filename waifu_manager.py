@@ -164,6 +164,14 @@ class WaifuManager:
         embed.set_footer(text=footer)
         return embed
     
+    async def get_player_waifus_raw(self, discord_id):
+        waifus = []
+        if self.player_waifu.get(discord_id, None) is None:
+            return None
+        player = self.players.players[discord_id]
+        waifus = await self._get_player_waifu_list(player)
+        return waifus
+    
     def filter_waifus(self, waifu):
         name = self.waifu_filters['name']
         waifu = waifu[1]

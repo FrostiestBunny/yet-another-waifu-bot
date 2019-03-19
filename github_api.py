@@ -29,6 +29,29 @@ async def create_card(body):
     return response
 
 
+async def create_gist(desc, body):
+    url = GITHUB_API_URL + "gists"
+    params = {
+        'access_token': GITHUB_API_TOKEN
+    }
+    headers = {
+        'Accept': CUSTOM_ACCEPT
+    }
+    payload = {
+        'description': desc,
+        'files': {
+            'waifus.txt': {
+                'content': body
+            }
+        }
+    }
+    response = ""
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=payload, params=params, headers=headers) as resp:
+            response = await resp.json()
+    return response
+
+
 async def get_commits():
     url = GITHUB_API_URL + "repos/zackunfair/yet-another-waifu-bot/commits"
     params = {

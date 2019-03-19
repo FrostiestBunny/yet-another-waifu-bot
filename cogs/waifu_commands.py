@@ -9,6 +9,7 @@ from difflib import SequenceMatcher
 from timers import timers
 import os
 import unicodedata
+import github_api
 
 from my_bot import MyBot
 
@@ -18,6 +19,8 @@ API_URL = "https://api.jikan.moe/v3/"
 COMICVINE_API_KEY = os.getenv("COMICVINE_API_KEY")
 COMICVINE_URL = "https://comicvine.gamespot.com/api/"
 COMICVINE_TOTAL_CHARS = 100000
+PASTEBIN_API_URL = "https://pastebin.com/api/api_post.php"
+PASTEBIN_API_KEY= os.getenv('PASTEBIN_API_KEY')
 
 
 class WaifuCommands(Cog, name="Waifu Commands"):
@@ -797,6 +800,21 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         await waifu_manager.trade_waifus(str(t1_member.id), trade.t1_list_id, str(t2_member.id), trade.t2_list_id)
         del self.current_trades[t1_member.id]
         del self.current_trades[t2_member.id]
+    
+    @command()
+    async def list_gist(self, ctx: Context):
+        author = ctx.message.author
+        waifus = await waifu_manager.get_player_waifus_raw(str(author.id))
+        if waifus is None:
+            await ctx.send("No waifus, that's pretty sad.")
+            return
+        body = ""
+        for waifu in waifus:
+            body += f"{waifu.name} ({waifu.mal_id})\n"
+        title = author.nick if author.nick is not None else author.name
+        title += "'s waifus"
+        response = await github_api.create_gist(title, body)
+        await ctx.send(response['html_url'])
 
 
 class WaifuTrade:
