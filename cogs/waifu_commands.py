@@ -734,6 +734,36 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             embed.set_field_at(1, name=f"{author.name}'s offer:", value=f"{waifu.name}", inline=False)
         await embed_msg.edit(embed=embed)
     
+    @trade.command(name="remove", aliases=['r'])
+    async def trade_remove_offer(self, ctx: Context):
+        """Remove an offer from your trade."""
+        author = ctx.message.author
+        if author.id not in self.current_trades:
+            await ctx.send("You're not trading with anyone right now.")
+            return
+        trade = self.current_trades[author.id]
+        embed_msg = trade.get_embed_msg()
+        embed = embed_msg.embeds[0]
+        if trade.t1_member.id == author.id:
+            if trade.t1_offer is None:
+                await ctx.send("No offer to remove.")
+                return
+            trade.set_t1_offer(None)
+            trade.set_t1_list_id(None)
+            trade.t1_confirmed = False
+            prev_field = embed.fields[0]
+            embed.set_field_at(0, name=f"{prev_field.name}", value="Nothing.", inline=prev_field.inline)
+        else:
+            if trade.t2_offer is None:
+                await ctx.send("No offer to remove.")
+                return
+            trade.set_t2_offer(None)
+            trade.set_t2_list_id(None)
+            trade.t2_confirmed = False
+            prev_field = embed.fields[1]
+            embed.set_field_at(1, name=f"{prev_field.name}", value="Nothing.", inline=prev_field.inline)
+        await embed_msg.edit(embed=embed)
+    
     @trade.command(name="confirm", aliases=['c'])
     async def trade_confirm(self, ctx: Context):
         """Confirm your trade."""
