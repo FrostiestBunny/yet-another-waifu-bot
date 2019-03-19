@@ -802,19 +802,43 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         del self.current_trades[t2_member.id]
     
     @command()
-    async def list_gist(self, ctx: Context):
+    async def list_gist(self, ctx: Context, flag: str = None):
         author = ctx.message.author
         waifus = await waifu_manager.get_player_waifus_raw(str(author.id))
         if waifus is None:
             await ctx.send("No waifus, that's pretty sad.")
             return
+        gist_id = waifu_manager.get_player_gist(str(author.id))
+        msg = ""
+        if  gist_id is not None:
+            if flag == "-update":
+                await self.update_gist(ctx, gist_id, waifus)
+                return
+            response = await github_api.get_gist(gist_id)
+            updated_at = response['updated_at'].replace('T', ' ').replace('Z', '')
+            msg = f"Found your gist, last updated {updated_at}\n"
+            msg += response['html_url']
+        else:
+            body = ""
+            for waifu in waifus:
+                body += f"{waifu.name} ({waifu.mal_id})\n"
+            title = author.nick if author.nick is not None else author.name
+            title += "'s waifus"
+            response = await github_api.create_gist(title, body)
+            new_gist_id = response['id']
+            waifu_manager.update_player_gist(str(author.id), new_gist_id)
+            msg = "Created new gist.\n"
+            msg += response['html_url']
+        await ctx.send(msg)
+    
+    async def update_gist(self, ctx: Context, gist_id: str, waifus):
         body = ""
         for waifu in waifus:
             body += f"{waifu.name} ({waifu.mal_id})\n"
-        title = author.nick if author.nick is not None else author.name
-        title += "'s waifus"
-        response = await github_api.create_gist(title, body)
-        await ctx.send(response['html_url'])
+        response = await github_api.update_gist(gist_id, body)
+        msg = "Updated your gist.\n"
+        msg += response['html_url']
+        await ctx.send(msg)
 
 
 class WaifuTrade:

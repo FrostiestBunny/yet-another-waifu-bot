@@ -184,6 +184,13 @@ class WaifuManager:
                 waifus.append(self.waifus.waifus[waifu_id])
             player.set_waifu_list(waifus)
         return player.get_waifu_list()
+    
+    def get_player_gist(self, discord_id):
+        player = self.players.players[discord_id]
+        return player.gist_id
+    
+    def update_player_gist(self, discord_id, gist_id):
+        self.players.update_player_gist_id(discord_id, gist_id)
 
     def save(self):
         self.conn.commit()
