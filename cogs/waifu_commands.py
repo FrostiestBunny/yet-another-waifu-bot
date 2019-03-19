@@ -8,6 +8,7 @@ import itertools
 from difflib import SequenceMatcher
 from timers import timers
 import os
+import unicodedata
 
 from my_bot import MyBot
 
@@ -437,7 +438,10 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         target = target.split(' ')
         for word in target:
             if word not in guess:
-                return False
+                word = unicodedata.normalize('NFKD', word).encode('ascii', 'ignore')
+                word = word.decode('ascii')
+                if word not in guess:
+                    return False
         return True
 
     async def calculate_similarity(self, guess, target):
