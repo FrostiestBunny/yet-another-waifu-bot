@@ -60,6 +60,17 @@ class MyBot(Bot):
                 if channel is not None:
                     waifu_commands = self.get_cog('Waifu Commands')
                     await waifu_commands.random_waifu(channel)
+    
+        ctx = await self.get_context(message)
+        if ctx.valid:
+            return
+        mentions = [m.id for m in message.mentions]
+        if self.user.id in mentions:
+            author = message.author
+            if await self.is_owner(author):
+                await message.channel.send("What do you want, dad?")
+            elif author.id == 266639261523116053:
+                await message.channel.send("Hey, Newt, did you miss me?~~")
         
     def load_my_extensions(self):
         extensions = self.get_my_extensions()

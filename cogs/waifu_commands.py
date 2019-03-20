@@ -839,7 +839,19 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         msg = "Updated your gist.\n"
         msg += response['html_url']
         await ctx.send(msg)
-
+    
+    @command()
+    async def headpat(self, ctx: Context, member: discord.Member):
+        author = ctx.message.author
+        if author.id == member.id:
+            await ctx.send(f"Feeling lonely, {author.mention}? *pats*")
+        elif member.id == self.bot.user.id:
+            if await self.bot.is_owner(author) or author.id == 266639261523116053:
+                await ctx.send("*gets patted*\nAww, thanks~~")
+            else:
+                await ctx.send("Uh, sorry, I don't think we're close enough.")
+        else:
+            await ctx.send(f"*{author.mention} pats {member.mention}'s head'*\n(gif soon)")
 
 class WaifuTrade:
 
