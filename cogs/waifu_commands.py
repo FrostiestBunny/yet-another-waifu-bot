@@ -843,15 +843,21 @@ class WaifuCommands(Cog, name="Waifu Commands"):
     @command()
     async def headpat(self, ctx: Context, member: discord.Member):
         author = ctx.message.author
+        gif_name = random.choice(os.listdir('images/headpats'))
+        gif = open(f'images/headpats/{gif_name}', "rb")
+        f = discord.File(gif, "headpat.gif")
         if author.id == member.id:
-            await ctx.send(f"Feeling lonely, {author.mention}? *pats*")
+            msg = f"Feeling lonely, {author.mention}? *pats*"
         elif member.id == self.bot.user.id:
             if await self.bot.is_owner(author) or author.id == 266639261523116053:
-                await ctx.send("*gets patted*\nAww, thanks~~")
+                msg = "*gets patted*\nAww, thanks~~"
             else:
                 await ctx.send("Uh, sorry, I don't think we're close enough.")
+                return
         else:
-            await ctx.send(f"*{author.mention} pats {member.mention}'s head'*\n(gif soon)")
+            msg = f"*{author.mention} pats {member.mention}'s head'*"
+        await ctx.send(content=msg, file=f)
+        gif.close()
 
 class WaifuTrade:
 
