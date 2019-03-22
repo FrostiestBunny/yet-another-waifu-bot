@@ -44,11 +44,6 @@ class OwnerOnly(Cog, name="Owner Commands"):
             if not member.bot:
                 players.add_player(member.id, member.name)
         await ctx.send("Updated player database")
-
-    @command()
-    async def set_spawn_channel(self, ctx: Context, channel: discord.TextChannel):
-        bot_config.update_config(channel.id)
-        await ctx.send("Spawn channel set to {}".format(channel.mention))
     
     @command()
     async def say(self, ctx: Context, channel_id: int, *args: str):
