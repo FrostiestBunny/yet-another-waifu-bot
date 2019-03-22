@@ -840,7 +840,7 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         msg += response['html_url']
         await ctx.send(msg)
     
-    @command()
+    @command(aliases=['pat'])
     async def headpat(self, ctx: Context, member: discord.Member):
         author = ctx.message.author
         gif_name = random.choice(os.listdir('images/headpats'))
@@ -855,7 +855,7 @@ class WaifuCommands(Cog, name="Waifu Commands"):
                 await ctx.send("Uh, sorry, I don't think we're close enough.")
                 return
         else:
-            msg = f"*{author.mention} pats {member.mention}'s head'*"
+            msg = f"*{author.mention} pats {member.mention}'s head*"
         await ctx.send(content=msg, file=f)
         gif.close()
 
