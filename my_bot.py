@@ -55,8 +55,8 @@ class MyBot(Bot):
         elif message.content == "o/":
             await message.channel.send("\o")
         if message.guild.name in APPROVED_SERVERS:
-            if random.randint(0, 99) < 1:
-                channel = self.get_channel(int(bot_config.spawn_channel_id))
+            if random.randint(0, 99) < 90:
+                channel = self.get_channel(int(bot_config.config['spawn_channel']))
                 if channel is not None:
                     waifu_commands = self.get_cog('Waifu Commands')
                     await waifu_commands.random_waifu(channel)

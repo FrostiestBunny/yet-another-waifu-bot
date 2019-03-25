@@ -22,7 +22,7 @@ class AdminOnly(Cog, name="Admin Commands"):
     
     @command()
     async def set_spawn_channel(self, ctx: Context, channel: discord.TextChannel):
-        bot_config.update_config(channel.id)
+        bot_config.update_config('spawn_channel', str(channel.id))
         await ctx.send("Spawn channel set to {}".format(channel.mention))
 
 

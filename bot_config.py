@@ -1,10 +1,13 @@
+from psycopg2 import sql
+
+
 class BotConfig:
 
     def __init__(self):
         self.conn = None
         self.cur = None
         self.config = {}
-        self.config_props = ['spawn_channel_id', 'spawn_rate']
+        self.config_props = ['spawn_channel', 'spawn_rate']
 
     def connect(self, conn):
         self.conn = conn
@@ -12,26 +15,27 @@ class BotConfig:
         self.load_config()
     
     def load_config(self):
-        columns = ', '.join(self.config_props)
-        self.cur.execute("SELECT %s FROM bot_config;", (columns,))
+        self.cur.execute("SELECT * FROM bot_config;")
         query = self.cur.fetchone()
         if query is None:
             return
+        print(query)
         for i, c in enumerate(query):
             self.config[self.config_props[i]] = c
+        print(self.config)
     
     def update_config(self, prop, value):
         if self.config.get(prop, None) is not None:
             self.alter_config(prop, value)
             return
         self.config[prop] = value
-        self.cur.execute("INSERT INTO bot_config (%s) VALUES (%s)",
+        self.cur.execute(sql.SQL("INSERT INTO bot_config ({}) VALUES (%s)").format(sql.Identifier(prop)),
                          (prop, value))
         self.save()
 
     def alter_config(self, prop, value):
-        self.cur.execute("UPDATE bot_config SET %s = %s WHERE %s=%s",
-                         (prop, value, prop, self.config[prop]))
+        self.cur.execute(sql.SQL("UPDATE bot_config SET {0} = %s WHERE {0} = %s").format(sql.Identifier(prop)),
+                         (value, self.config[prop]))
         self.save()
         self.config[prop] = value
 
