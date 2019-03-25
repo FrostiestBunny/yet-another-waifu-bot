@@ -19,10 +19,8 @@ class BotConfig:
         query = self.cur.fetchone()
         if query is None:
             return
-        print(query)
         for i, c in enumerate(query):
             self.config[self.config_props[i]] = c
-        print(self.config)
     
     def update_config(self, prop, value):
         if self.config.get(prop, None) is not None:
