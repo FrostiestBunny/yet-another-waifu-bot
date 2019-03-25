@@ -13,13 +13,14 @@ class Waifus:
     def load_waifus(self):
         print("Loading waifus")
         self.cur.execute("SELECT waifu_id, name, nickname, affection, stats,\
-                          mal_id, last_interaction, acquired, is_comicvine FROM waifus;")
+                          mal_id, last_interaction, acquired, is_comicvine, is_favorite, emoji_code FROM waifus;")
         query = self.cur.fetchall()
         for row in query:
-            waifu_id, name, nickname, affection, stats, mal_id, last_interaction, acquired, is_comicvine = row
-            self.waifus[int(waifu_id)] = Waifu(int(waifu_id), str(mal_id), str(name), is_comicvine,
+            waifu_id, name, nickname, affection, stats, mal_id,\
+                 last_interaction, acquired, is_comicvine, is_favorite, emoji_code = row
+            self.waifus[int(waifu_id)] = Waifu(int(waifu_id), str(mal_id), str(name), is_comicvine, is_favorite,
                                                str(nickname), int(affection), str(stats),
-                                               str(last_interaction), str(acquired))
+                                               str(last_interaction), str(acquired), emoji_code)
         print("waifus loaded")
 
     def add_waifu(self, mal_id, name, is_comicvine):
@@ -36,6 +37,20 @@ class Waifus:
         del self.waifus[waifu_id]
         self.cur.execute("DELETE FROM waifus WHERE waifu_id=%s", (waifu_id,))
         self.save()
+    
+    def set_waifu_favorite(self, waifu, emoji_code):
+        self.cur.execute("UPDATE waifus SET is_favorite = true, emoji_code = %s WHERE waifu_id=%s",
+         (emoji_code, waifu.waifu_id))
+        self.save()
+        waifu.is_favorite = True
+        waifu.emoji_code = emoji_code
+    
+    def unfavorite_waifu(self, waifu):
+        self.cur.execute("UPDATE waifus SET is_favorite = false, emoji_code = NULL WHERE waifu_id=%s", 
+         (waifu.waifu_id,))
+        self.save()
+        waifu.is_favorite = False
+        waifu.emoji_code = None
 
     def get_latest_waifu_id(self, mal_id):
         self.cur.execute(
@@ -51,17 +66,19 @@ class Waifus:
 
 class Waifu:
 
-    def __init__(self, waifu_id, mal_id, name, is_comicvine, nickname=None,
-                 affection=0, stats="1:1:1", last_interaction=None, acquired=None):
+    def __init__(self, waifu_id, mal_id, name, is_comicvine, is_favorite, nickname=None,
+                 affection=0, stats="1:1:1", last_interaction=None, acquired=None, emoji_code=None):
         self.waifu_id = waifu_id
         self.mal_id = mal_id
         self.name = name
         self.is_comicvine = is_comicvine
+        self.is_favorite = is_favorite
         self.nickname = nickname
         self.affection = affection
         self.stats = stats
         self.last_interaction = last_interaction
         self.acquired = acquired
+        self.emoji_code = emoji_code
 
 
 waifus = Waifus()

@@ -523,6 +523,18 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             filters = {
                 "name": content[i:]
             }
+        elif "-favorite" in content:
+            i = content.index("-favorite")
+            i += 10
+            if content[i:] == "":
+                filters = {
+                    "favorite": True
+                }
+            else:
+                filters = {
+                    "favorite": True,
+                    "emoji": content[i:]
+                }
         else:
             try:
                 page = int(args[0])
@@ -858,6 +870,26 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             msg = f"*{author.mention} pats {member.mention}'s head*"
         await ctx.send(content=msg, file=f)
         gif.close()
+    
+    @command()
+    async def favorite(self, ctx: Context, list_id: int, emoji: str = None):
+        author = ctx.message.author
+        waifu = await waifu_manager.get_player_waifu(str(author.id), list_id)
+        if waifu is None:
+            await ctx.send(f"No waifu with id {list_id}")
+            return
+        if emoji is None:
+            await waifu_manager.unfavorite_waifu(str(author.id), list_id)
+            await ctx.send(f"Successfully removed {waifu.name} from favorites.")
+            return
+        try:
+            emoji_code = ord(emoji)
+        except TypeError:
+            await ctx.send("Server specific emoji not supported yet, blame dad's laziness.")
+            return
+        await waifu_manager.set_waifu_as_favorite(str(author.id), list_id, emoji_code)
+        await ctx.send(f"Set {waifu.name} as favorite under {emoji} emoji.")
+
 
 class WaifuTrade:
 

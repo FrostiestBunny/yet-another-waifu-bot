@@ -51,6 +51,14 @@ class WaifuManager:
         self.save()
         self.waifus.remove_waifu(waifu.waifu_id)
     
+    async def set_waifu_as_favorite(self, discord_id, list_id, emoji_code):
+        waifu = await self.get_player_waifu(discord_id, list_id)
+        self.waifus.set_waifu_favorite(waifu, emoji_code)
+    
+    async def unfavorite_waifu(self, discord_id, list_id):
+        waifu = await self.get_player_waifu(discord_id, list_id)
+        self.waifus.unfavorite_waifu(waifu)
+    
     async def trade_waifus(self, t1_discord_id, t1_list_id, t2_discord_id, t2_list_id):
         t1_waifu = await self.get_player_waifu(t1_discord_id, t1_list_id)
         t2_waifu = await self.get_player_waifu(t2_discord_id, t2_list_id)
@@ -155,6 +163,8 @@ class WaifuManager:
                 break
             message += str(n)
             message += " | "
+            if waifu.emoji_code is not None:
+                message += chr(waifu.emoji_code) + " "
             message += waifu.name
             message += " | Affection: {}".format(waifu.affection)
             message += "\n"
@@ -173,9 +183,16 @@ class WaifuManager:
         return waifus
     
     def filter_waifus(self, waifu):
-        name = self.waifu_filters['name']
+        name = self.waifu_filters.get('name', None)
+        favorite = self.waifu_filters.get('favorite', None)
         waifu = waifu[1]
-        return name.lower() in waifu.name.lower()
+        if name is not None:
+            return name.lower() in waifu.name.lower()
+        if favorite is not None:
+            emoji = self.waifu_filters.get('emoji', None)
+            if emoji is not None:
+                return waifu.is_favorite and emoji == chr(waifu.emoji_code)
+            return waifu.is_favorite
 
     async def _get_player_waifu_list(self, player):
         waifus = []

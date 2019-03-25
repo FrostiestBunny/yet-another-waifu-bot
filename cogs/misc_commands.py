@@ -69,6 +69,14 @@ class MiscCommands(Cog, name="Misc Commands"):
         f = discord.File(output, 'uwot.png')
         await ctx.send(file=f)
         output.close()
+    
+    @command()
+    async def get_emoji(self, ctx: Context, emoji: str):
+        emoji = ord(emoji)
+        print(emoji)
+        emoji = chr(emoji)
+        print(emoji)
+        await ctx.send(emoji)
 
 
 def setup(bot: MyBot):
