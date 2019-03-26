@@ -879,9 +879,12 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             await ctx.send(f"No waifu with id {list_id}")
             return
         if emoji is None:
-            await waifu_manager.unfavorite_waifu(str(author.id), list_id)
-            await ctx.send(f"Successfully removed {waifu.name} from favorites.")
-            return
+            if waifu.is_favorite:
+                await waifu_manager.unfavorite_waifu(str(author.id), list_id)
+                await ctx.send(f"Successfully removed {waifu.name} from favorites.")
+                return
+            else:
+                emoji = "❤"
         try:
             emoji_code = ord(emoji)
         except TypeError:
