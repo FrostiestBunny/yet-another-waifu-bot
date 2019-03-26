@@ -31,7 +31,7 @@ class Waifus:
                          (name, None, 0, "1:1:1", mal_id, None, is_comicvine))
         self.save()
         waifu_id = self.get_latest_waifu_id(mal_id)
-        self.waifus[waifu_id] = Waifu(waifu_id, mal_id, name, is_comicvine)
+        self.waifus[waifu_id] = Waifu(waifu_id, mal_id, name, is_comicvine, is_favorite=False)
     
     def remove_waifu(self, waifu_id):
         del self.waifus[waifu_id]
