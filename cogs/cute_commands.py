@@ -10,6 +10,8 @@ class CuteCommands(Cog, name="Cute Commands"):
 
     def __init__(self, bot: MyBot):
         self.bot = bot
+        self.newt_id = 266639261523116053
+        self.zack_id = 178887072864665600
     
     @command()
     async def praise(self, ctx: Context, member: discord.Member):
@@ -17,11 +19,11 @@ class CuteCommands(Cog, name="Cute Commands"):
         if member.id == author.id:
             await ctx.send("Praising yourself? How sad.\n*pats*")
         elif member.id == self.bot.user.id:
-            if author.id == 266639261523116053:
+            if author.id == self.newt_id:
                 await ctx.send("Aww, you didn't have to. You're the best ❤")
             else:
                 await ctx.send("Thanks! You are pretty cool yourself.")
-        elif member.id == 178887072864665600:
+        elif member.id == self.zack_id:
             await ctx.send(
                 f"{member.mention}\nDad, {author.name} praised you. You're so popular.")
         else:
@@ -40,7 +42,7 @@ class CuteCommands(Cog, name="Cute Commands"):
         compliment = response["compliment"].capitalize() + "."
         await ctx.send("{}\n{}".format(member.mention, compliment))
         if member.id == self.bot.user.id:
-            if ctx.message.author.id == 266639261523116053:
+            if ctx.message.author.id == self.newt_id:
                 await ctx.send("*blushes*\nThanks Newt! ❤")
             else:
                 await ctx.send("Wow, thank you, {}!".format(ctx.message.author.mention))
@@ -52,7 +54,7 @@ class CuteCommands(Cog, name="Cute Commands"):
             await ctx.send("How does that work? 🤔")
             return
         if member.id == self.bot.user.id:
-            if author.id not in [178887072864665600, 266639261523116053]:
+            if author.id not in [self.zack_id, self.newt_id]:
                 await ctx.send("Uh, sorry, but no.")
                 return
         gif_name = random.choice(os.listdir('images/hugs'))
@@ -70,7 +72,7 @@ class CuteCommands(Cog, name="Cute Commands"):
         if author.id == member.id:
             msg = f"Feeling lonely, {author.mention}? *pats*"
         elif member.id == self.bot.user.id:
-            if await self.bot.is_owner(author) or author.id == 266639261523116053:
+            if author.id == self.zack_id or author.id == self.newt_id:
                 msg = "*gets patted*\nAww, thanks~~"
             else:
                 await ctx.send("Uh, sorry, I don't think we're close enough.")
