@@ -494,24 +494,6 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         extra_letters = len(guess) - size
         return (len(target) - size) + extra_letters
 
-    @command() # TODO Move to admin or owner only
-    async def skip(self, ctx: Context):
-        if ctx.message.author.id == 297869043640172545:
-            await ctx.send("Matthew no")
-            return
-        if ctx.message.author.id != 178887072864665600:
-            await ctx.send("You don't look like Zack to me.")
-            return
-        if waifu_manager.current_waifu_spawn is None:
-            await ctx.send("There's nothing to skip though 🤔")
-            return
-        await waifu_manager.skip_waifu()
-        claim_message = waifu_manager.claim_message
-        old_embed = claim_message.embeds[0]
-        embed = discord.Embed(title=old_embed.title, description="SKIPPED",
-                              color=old_embed.color)
-        await claim_message.edit(embed=embed)
-
     @command(name='list')
     async def waifu_list(self, ctx: Context, *args):
         page = 1
@@ -570,19 +552,6 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             desc += "Source: " + anime['source']
             embed.add_field(name="**" + anime['title'] + "**", value=desc, inline=False)
         await ctx.send(embed=embed)
-
-    @command() # TODO Move to misc
-    async def insult(self, ctx: Context, member: discord.Member):
-        name = member.nick if member.nick is not None else member.name
-        author = ctx.message.author
-        if member.id == self.bot.user.id:
-            await ctx.send("No u.")
-            name = author.nick if author.nick is not None else author.name
-        session = http_session.get_connection()
-        params = {'who': name}
-        async with session.get("https://insult.mattbas.org/api/insult", params=params) as resp:
-            response = await resp.text()
-        await ctx.send(response)
 
     @command()
     async def view(self, ctx: Context, list_id: int):

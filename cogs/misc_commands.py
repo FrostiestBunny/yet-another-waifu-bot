@@ -4,6 +4,7 @@ from my_bot import MyBot
 from io import BytesIO
 import aiohttp
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from http_session import http_session
 
 
 class MiscCommands(Cog, name="Misc Commands"):
@@ -71,12 +72,17 @@ class MiscCommands(Cog, name="Misc Commands"):
         output.close()
     
     @command()
-    async def get_emoji(self, ctx: Context, emoji: str):
-        emoji = ord(emoji)
-        print(emoji)
-        emoji = chr(emoji)
-        print(emoji)
-        await ctx.send(emoji)
+    async def insult(self, ctx: Context, member: discord.Member):
+        name = member.nick if member.nick is not None else member.name
+        author = ctx.message.author
+        if member.id == self.bot.user.id:
+            await ctx.send("No u.")
+            name = author.nick if author.nick is not None else author.name
+        session = http_session.get_connection()
+        params = {'who': name}
+        async with session.get("https://insult.mattbas.org/api/insult", params=params) as resp:
+            response = await resp.text()
+        await ctx.send(response)
 
 
 def setup(bot: MyBot):

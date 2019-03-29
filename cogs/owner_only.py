@@ -2,7 +2,6 @@ import discord
 from discord.ext.commands import Cog, Context, NotOwner, command
 from my_bot import MyBot
 from player import players
-from bot_config import bot_config
 from waifu_manager import waifu_manager
 from timers import timers
 import aiohttp
@@ -84,6 +83,18 @@ class OwnerOnly(Cog, name="Owner Commands"):
         message = await ctx.send(embed=embed)
         waifu_manager.set_claim_message(message)
         timers.set_waifu_claim_timer()
+    
+    @command()
+    async def skip(self, ctx: Context):
+        if waifu_manager.current_waifu_spawn is None:
+            await ctx.send("There's nothing to skip though 🤔")
+            return
+        await waifu_manager.skip_waifu()
+        claim_message = waifu_manager.claim_message
+        old_embed = claim_message.embeds[0]
+        embed = discord.Embed(title=old_embed.title, description="SKIPPED",
+                              color=old_embed.color)
+        await claim_message.edit(embed=embed)
 
 
 def setup(bot: MyBot):
