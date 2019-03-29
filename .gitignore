@@ -1,6 +1,6 @@
 
-# Created by https://www.gitignore.io/api/linux,python,visualstudiocode
-# Edit at https://www.gitignore.io/?templates=linux,python,visualstudiocode
+# Created by https://www.gitignore.io/api/linux,python,windows,visualstudiocode
+# Edit at https://www.gitignore.io/?templates=linux,python,windows,visualstudiocode
 
 ### Linux ###
 *~
@@ -40,6 +40,7 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
@@ -101,6 +102,13 @@ ipython_config.py
 # pyenv
 .python-version
 
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don’t work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
 # celery beat schedule file
 celerybeat-schedule
 
@@ -134,11 +142,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-### Python Patch ###
-.venv/
-
 ### VisualStudioCode ###
-.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -149,4 +153,29 @@ dmypy.json
 # Ignore all local history of files
 .history
 
-# End of https://www.gitignore.io/api/linux,python,visualstudiocode
+### Windows ###
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.stackdump
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# End of https://www.gitignore.io/api/linux,python,windows,visualstudiocode
