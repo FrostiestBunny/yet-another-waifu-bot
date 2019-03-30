@@ -1,7 +1,6 @@
 import discord
 from discord.ext.commands import Bot
 from glob import glob
-import argparse
 from player import players
 from waifu import waifus
 from waifu_manager import waifu_manager
@@ -16,27 +15,27 @@ APPROVED_SERVERS = ["MordredBot Dev", "Newt3012's Lets Play Discussion"]
 LAST_STATUS = None
 LAST_GAME = None
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-m", "--maintenance", help="turn on maintenance mode",
-                    action="store_true")
-COMMAND_ARGS = parser.parse_args()
-
 
 class MyBot(Bot):
 
+    def set_cmd_args(self, cmd_args):
+        self.cmd_args = cmd_args
+
     async def on_ready(self):
-        global COMMAND_ARGS
         self.load_my_extensions()
         http_session.connect()
-        gg_manager.connect(COMMAND_ARGS.maintenance)
+        gg_manager.connect(self.cmd_args.maintenance)
         bot_config.connect(gg_manager.conn)
         players.connect(gg_manager.conn)
         waifus.connect(gg_manager.conn)
         waifu_manager.players = players
         waifu_manager.waifus = waifus
 
-        if COMMAND_ARGS.maintenance:
+        if self.cmd_args.maintenance:
             game = discord.Game("undergoing surgery.")
+            await self.change_presence(status=discord.Status.dnd, activity=game)
+        if self.cmd_args.newt:
+            game = discord.Game("playing with Newt.")
             await self.change_presence(status=discord.Status.dnd, activity=game)
 
         waifu_manager.connect(gg_manager.conn)
