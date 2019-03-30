@@ -94,6 +94,8 @@ class CuteCommands(Cog, name="Cute Commands"):
                 await ctx.send("*blush*, Newt we can't do that right now.❤~~\nMaybe later we can do something when it's a bit more private. *wink* ❤❤")
             else:
                 await ctx.send("Screw off loser find some other girl to bark up. You're disgusting and I hope I never have to beathe the same air as you.")
+        elif member.id == self.zack_id:
+            await ctx.send("God dad what the hell is wrong with you?!?!?")
                 
     @command()
     async def love(self, ctx: Context, member: discord.Member):
