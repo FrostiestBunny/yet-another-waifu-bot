@@ -43,9 +43,9 @@ class CuteCommands(Cog, name="Cute Commands"):
         await ctx.send("{}\n{}".format(member.mention, compliment))
         if member.id == self.bot.user.id:
             if ctx.message.author.id == self.newt_id:
-                await ctx.send("*blushes*\nThanks Newt! ❤")
+                await ctx.send("*blushes*\nThanks Newt! ❤\n I-I-I love you too.❤")
             else:
-                await ctx.send("Wow, thank you, {}!".format(ctx.message.author.mention))
+                await ctx.send("Thanks I guess. {}!".format(ctx.message.author.mention))
     
     @command()
     async def hug(self, ctx: Context, member: discord.Member):
@@ -55,11 +55,11 @@ class CuteCommands(Cog, name="Cute Commands"):
             return
         if member.id == self.bot.user.id:
             if author.id not in [self.zack_id, self.newt_id]:
-                await ctx.send("Uh, sorry, but no.")
+                await ctx.send("What the hell do you think you're doing? Leave me alone.")
                 return
         gif_name = random.choice(os.listdir('images/hugs'))
         with open(f'images/hugs/{gif_name}', "rb") as gif:
-            msg = f"{ctx.message.author.mention} hugs {member.mention}"
+            msg = f"{ctx.message.author.mention} hugs {member.mention}\n*smiles* Thanks!"
             f = discord.File(gif, "hug.gif")
             await ctx.send(content=msg, file=f)
     
@@ -72,16 +72,25 @@ class CuteCommands(Cog, name="Cute Commands"):
         if author.id == member.id:
             msg = f"Feeling lonely, {author.mention}? *pats*"
         elif member.id == self.bot.user.id:
-            if author.id == self.zack_id or author.id == self.newt_id:
-                msg = "*gets patted*\nAww, thanks~~"
+            if author.id == self.newt_id:
+                msg = "*gets patted*\nAww, thanks Newt ❤~~\n*blushes*"
             else:
-                await ctx.send("Uh, sorry, I don't think we're close enough.")
+                await ctx.send("Ew, don't touch me.")
                 return
         else:
             msg = f"*{author.mention} pats {member.mention}'s head*"
         await ctx.send(content=msg, file=f)
         gif.close()
-
+    @command()
+    async def lewd(self, ctx: Context, member: discord.Member):
+        author = ctx.message.author
+        if member.id == author.id:
+            await ctx.send("You're just disgusting.")
+        elif member.id == self.bot.user.id:
+            if author.id == self.newt_id:
+                await ctx.send("*blush*, Newt we can't do that right now.❤~~\nMaybe later we can do something when it's a bit more private. *wink* ❤❤")
+            else:
+                await ctx.send("Screw off loser find some other girl to bark up. You're disgusting and I hope I never have to beathe the same air as you.")
 
 def setup(bot: MyBot):
     cog = CuteCommands(bot)
