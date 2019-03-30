@@ -83,7 +83,9 @@ class MiscCommands(Cog, name="Misc Commands"):
         async with session.get("https://insult.mattbas.org/api/insult", params=params) as resp:
             response = await resp.text()
         await ctx.send(response)
-
+    @command()
+    async def rip_zack(self, ctx: Context):
+        await ctx.send("May one day dad come back to life.")
 
 def setup(bot: MyBot):
     c = MiscCommands(bot)

@@ -35,7 +35,7 @@ class MyBot(Bot):
             game = discord.Game("undergoing surgery.")
             await self.change_presence(status=discord.Status.dnd, activity=game)
         if self.cmd_args.newt:
-            game = discord.Game("playing with Newt.")
+            game = discord.Game("with Newt ❤❤❤.")
             await self.change_presence(status=discord.Status.dnd, activity=game)
 
         waifu_manager.connect(gg_manager.conn)
