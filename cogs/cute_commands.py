@@ -109,7 +109,7 @@ class CuteCommands(Cog, name="Cute Commands"):
                 await ctx.send("I don't even know you. Leave me alone you creep.")
         elif member.id == self.zack_id:
             await ctx.send("*blushes* Daaaaaad stop it.You're embarrassing me in front of Newt")
-
+            
 
 def setup(bot: MyBot):
     cog = CuteCommands(bot)

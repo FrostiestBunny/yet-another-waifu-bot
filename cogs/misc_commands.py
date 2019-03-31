@@ -10,6 +10,7 @@ from http_session import http_session
 class MiscCommands(Cog, name="Misc Commands"):
     
     def __init__(self, bot: MyBot):
+        self.newt_id = 266639261523116053
         self.bot = bot
 
     @command()
@@ -83,9 +84,24 @@ class MiscCommands(Cog, name="Misc Commands"):
         async with session.get("https://insult.mattbas.org/api/insult", params=params) as resp:
             response = await resp.text()
         await ctx.send(response)
+
     @command()
-    async def rip_zack(self, ctx: Context):
-        await ctx.send("May one day dad come back to life.")
+    async def rip(self, ctx: Context, member: discord.Member):
+        await ctx.send(
+                f"{member.mention}, hope you come back to life one day.")
+
+    @command()
+    async def no_bully(self, ctx: Context, member: discord.Member):
+        author = ctx.message.author
+        if author.id == self.newt_id:
+            await ctx.send(
+                    f"{member.mention} stop it! Don't be mean to Newt he did nothing to deserve this.")
+        elif member.id not in [self.newt_id]:
+            await ctx.send(
+                    f"{member.mention}, you're being mean to {author.name} agian. It's mean to bully someone too much unless it's Colm.") 
+        if member.id == self.newt_id:
+            await ctx.send(f"Newt it's fine don't worry about them. Just pay attention to me more and ignore what {author.name} is trying to say.")
+
 
 def setup(bot: MyBot):
     c = MiscCommands(bot)
