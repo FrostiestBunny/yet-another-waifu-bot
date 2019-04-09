@@ -17,7 +17,7 @@ class Waifus:
         query = self.cur.fetchall()
         for row in query:
             waifu_id, name, nickname, affection, stats, mal_id,\
-                 last_interaction, acquired, is_comicvine, is_favorite, emoji_code = row
+                last_interaction, acquired, is_comicvine, is_favorite, emoji_code = row
             self.waifus[int(waifu_id)] = Waifu(int(waifu_id), str(mal_id), str(name), is_comicvine, is_favorite,
                                                str(nickname), int(affection), str(stats),
                                                str(last_interaction), str(acquired), emoji_code)
@@ -40,14 +40,14 @@ class Waifus:
     
     def set_waifu_favorite(self, waifu, emoji_code):
         self.cur.execute("UPDATE waifus SET is_favorite = true, emoji_code = %s WHERE waifu_id=%s",
-         (emoji_code, waifu.waifu_id))
+                         (emoji_code, waifu.waifu_id))
         self.save()
         waifu.is_favorite = True
         waifu.emoji_code = emoji_code
     
     def unfavorite_waifu(self, waifu):
         self.cur.execute("UPDATE waifus SET is_favorite = false, emoji_code = NULL WHERE waifu_id=%s", 
-         (waifu.waifu_id,))
+                         (waifu.waifu_id,))
         self.save()
         waifu.is_favorite = False
         waifu.emoji_code = None

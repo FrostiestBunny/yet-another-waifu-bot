@@ -98,9 +98,11 @@ class MiscCommands(Cog, name="Misc Commands"):
                 f"{member.mention} stop it! Don't be mean to Newt he did nothing to deserve this.")
         elif member.id not in [self.newt_id]:
             await ctx.send(
-                f"{member.mention}, you're being mean to {author.name} agian. It's mean to bully someone too much unless it's Colm.") 
+                f"{member.mention}, you're being mean to {author.name} again. "
+                "It's mean to bully someone too much unless it's Colm.") 
         if member.id == self.newt_id:
-            await ctx.send(f"Newt it's fine don't worry about them. Just pay attention to me more and ignore what {author.name} is trying to say.")
+            await ctx.send("Newt it's fine don't worry about them. "
+                           f"Just pay attention to me more and ignore what {author.name} is trying to say.")
 
 
 def setup(bot: MyBot):
