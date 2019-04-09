@@ -35,7 +35,7 @@ class MyBot(Bot):
             game = discord.Game("undergoing surgery.")
             await self.change_presence(status=discord.Status.dnd, activity=game)
         if self.cmd_args.newt:
-            game = discord.Game("playing with Newt.")
+            game = discord.Game("with Newt ❤❤❤.")
             await self.change_presence(status=discord.Status.dnd, activity=game)
 
         waifu_manager.connect(gg_manager.conn)
@@ -67,7 +67,7 @@ class MyBot(Bot):
         if self.user.id in mentions:
             author = message.author
             if await self.is_owner(author):
-                await message.channel.send("What do you want, Master?")
+                await message.channel.send("You wanted something Master?")
             elif author.id == 266639261523116053:
                 await message.channel.send("Hey, Newt, did you miss me❤❤❤~~?")
         
