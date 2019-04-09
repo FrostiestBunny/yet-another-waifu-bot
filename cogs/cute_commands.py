@@ -97,7 +97,7 @@ class CuteCommands(Cog, name="Cute Commands"):
                 await ctx.send("God dad what the hell is wrong with you?!?!?")
             else:
                 await ctx.send("Screw off loser find some other girl to bark up. "
-                               "You're disgusting and I hope I never have to beathe the same air as you.")
+                               "You're disgusting and I hope I never have to breathe the same air as you.")
                 
     @command()
     async def love(self, ctx: Context, member: discord.Member):

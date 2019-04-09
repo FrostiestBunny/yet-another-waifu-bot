@@ -10,7 +10,7 @@ class NSFWOnly(Cog, name="NSFW Commands"):
     
     async def cog_command_error(self, ctx: Context, error):
         if isinstance(error, CheckFailure):
-            await ctx.send(f"{ctx.message.channel.mention} isn't marked as NSFW.")
+            await ctx.send(error)
             return
         raise error
     
@@ -18,7 +18,7 @@ class NSFWOnly(Cog, name="NSFW Commands"):
         channel = ctx.message.channel
         if channel.is_nsfw():
             return True
-        raise CheckFailure("Channel isn't marked as NSFW")
+        raise CheckFailure(f"{channel.mention} isn't marked as NSFW.")
         
     async def get_random_img_from_file(self, filename):
         images = []
