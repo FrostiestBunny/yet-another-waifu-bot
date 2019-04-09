@@ -20,7 +20,7 @@ COMICVINE_API_KEY = os.getenv("COMICVINE_API_KEY")
 COMICVINE_URL = "https://comicvine.gamespot.com/api/"
 COMICVINE_TOTAL_CHARS = 100000
 PASTEBIN_API_URL = "https://pastebin.com/api/api_post.php"
-PASTEBIN_API_KEY= os.getenv('PASTEBIN_API_KEY')
+PASTEBIN_API_KEY = os.getenv('PASTEBIN_API_KEY')
 
 
 class WaifuCommands(Cog, name="Waifu Commands"):
@@ -602,12 +602,12 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         self.waiting_to_trade.append(author.id)
         self.waiting_to_trade.append(member.id)
         await ctx.send(f"{member.mention}, {author.mention} wants to trade with you. " +
-                           "Say 'yes' to accept, 'no' to decline.")
+                       "Say 'yes' to accept, 'no' to decline.")
 
         def check_trade_message(msg):
             return msg.content.lower() == "yes" or msg.content.lower() == "no"\
                 and msg.author.id == member.id\
-                    and msg.channel.id == ctx.message.channel.id
+                and msg.channel.id == ctx.message.channel.id
 
         try:
             msg = await self.bot.wait_for('message', check=check_trade_message, timeout=120)
@@ -731,7 +731,7 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         await waifu_manager.trade_waifus(str(t1_member.id), trade.t1_list_id, str(t2_member.id), trade.t2_list_id)
         del self.current_trades[t1_member.id]
         del self.current_trades[t2_member.id]
-    
+
     @command()
     async def list_gist(self, ctx: Context, flag: str = None):
         author = ctx.message.author
@@ -741,7 +741,7 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             return
         gist_id = waifu_manager.get_player_gist(str(author.id))
         msg = ""
-        if  gist_id is not None:
+        if gist_id is not None:
             if flag == "-update":
                 await self.update_gist(ctx, gist_id, waifus)
                 return

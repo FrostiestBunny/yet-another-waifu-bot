@@ -4,5 +4,8 @@ python:
 
 install:
   - pip install -r requirements.txt
+  - pip install pylama
 
-script: pytest
+script:
+  - pytest
+  - pylama -l pycodestyle

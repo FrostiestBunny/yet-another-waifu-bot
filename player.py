@@ -9,7 +9,7 @@ class Players:
         self.conn = conn
         self.cur = self.conn.cursor()
         self.load_players()
-    
+
     def load_players(self):
         self.cur.execute("SELECT id, currency, won_fights, lost_fights, gist_id FROM players;")
         query = self.cur.fetchall()
@@ -17,7 +17,7 @@ class Players:
             _id, currency, won_fights, lost_fights, gist_id = row
             self.players[str(_id)] = Player(str(_id), int(won_fights),
                                             int(lost_fights), int(currency), gist_id)
-    
+
     def add_player(self, _id, username):
         _id = str(_id)
         if _id in self.players:
@@ -38,7 +38,7 @@ class Players:
         query = self.cur.fetchone()
         discord_id = query[0]
         return str(discord_id)
-    
+
     def update_player_gist_id(self, discord_id, gist_id):
         discord_id = str(discord_id)
         if discord_id not in self.players:
@@ -60,10 +60,10 @@ class Player:
         self.currency = currency
         self.gist_id = gist_id
         self.waifu_list = None
-    
+
     def set_waifu_list(self, waifu_list):
         self.waifu_list = waifu_list
-    
+
     def get_waifu_list(self):
         return self.waifu_list
 

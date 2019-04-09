@@ -16,8 +16,8 @@ class MiscCommands(Cog, name="Misc Commands"):
     async def suggest(self, ctx: Context, *args):
         suggestion = ' '.join(args)
         description = suggestion
-        embed = discord.Embed(title=ctx.message.author.name, description=description,
-                            color=0x0760FA)
+        embed = discord.Embed(title=ctx.message.author.name, description=description, 
+                              color=0x0760FA)
         channel = await self.bot.get_suggestion_channel()
         message = await channel.send(embed=embed)
         await message.add_reaction(':yes_emoji:529842623532367872')
