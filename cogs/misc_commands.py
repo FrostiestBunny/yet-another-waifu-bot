@@ -17,7 +17,7 @@ class MiscCommands(Cog, name="Misc Commands"):
     async def suggest(self, ctx: Context, *args):
         suggestion = ' '.join(args)
         description = suggestion
-        embed = discord.Embed(title=ctx.message.author.name, description=description, 
+        embed = discord.Embed(title=ctx.message.author.name, description=description,
                               color=0x0760FA)
         channel = await self.bot.get_suggestion_channel()
         message = await channel.send(embed=embed)
@@ -88,17 +88,17 @@ class MiscCommands(Cog, name="Misc Commands"):
     @command()
     async def rip(self, ctx: Context, member: discord.Member):
         await ctx.send(
-                f"{member.mention}, hope you come back to life one day.")
+            f"{member.mention}, hope you come back to life one day.")
 
     @command()
     async def no_bully(self, ctx: Context, member: discord.Member):
         author = ctx.message.author
         if author.id == self.newt_id:
             await ctx.send(
-                    f"{member.mention} stop it! Don't be mean to Newt he did nothing to deserve this.")
+                f"{member.mention} stop it! Don't be mean to Newt he did nothing to deserve this.")
         elif member.id not in [self.newt_id]:
             await ctx.send(
-                    f"{member.mention}, you're being mean to {author.name} agian. It's mean to bully someone too much unless it's Colm.") 
+                f"{member.mention}, you're being mean to {author.name} agian. It's mean to bully someone too much unless it's Colm.") 
         if member.id == self.newt_id:
             await ctx.send(f"Newt it's fine don't worry about them. Just pay attention to me more and ignore what {author.name} is trying to say.")
 

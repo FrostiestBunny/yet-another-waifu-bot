@@ -110,7 +110,6 @@ class CuteCommands(Cog, name="Cute Commands"):
             else:
                 await ctx.send("I don't even know you. Leave me alone you creep.")
         
-            
 
 def setup(bot: MyBot):
     cog = CuteCommands(bot)

@@ -100,4 +100,3 @@ class OwnerOnly(Cog, name="Owner Commands"):
 def setup(bot: MyBot):
     c = OwnerOnly(bot)
     bot.add_cog(c)
-

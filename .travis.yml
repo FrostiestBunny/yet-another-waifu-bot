@@ -5,7 +5,8 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install pylama
+  - pip install pyflakes
 
 script:
   - pytest
-  - pylama -l pycodestyle
+  - pylama -l pyflakes

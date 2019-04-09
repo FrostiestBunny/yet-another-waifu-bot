@@ -1,4 +1,3 @@
-import discord
 from discord.ext.commands import Cog, Context, command, CheckFailure
 from my_bot import MyBot
 import random
