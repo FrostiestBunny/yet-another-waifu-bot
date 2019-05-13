@@ -96,7 +96,10 @@ class WaifuManager:
         self.is_prepared = True
 
     def prepare_comic_spawn(self, waifu_props):
-        character_props = waifu_props['results'][0]
+        try:
+            character_props = waifu_props['results'][0]
+        except KeyError:
+            character_props = waifu_props['results']
         comic_id = str(character_props['id'])
         name = character_props['name']
         image_url = character_props['image']['medium_url']

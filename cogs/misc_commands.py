@@ -106,6 +106,7 @@ class MiscCommands(Cog, name="Misc Commands"):
             await ctx.send("Newt it's fine don't worry about them. "
                            f"Just pay attention to me more and ignore what {author.name} is trying to say.")
     
+    # TODO Make the time thing work
     def is_before(self, last_time, delta_h):
         # if between 0 and 6 then same day else next day, set breakpoint, then simply check if now is before it
         # only care for the hour and set day accordingly
