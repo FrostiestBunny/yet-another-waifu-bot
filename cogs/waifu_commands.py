@@ -356,6 +356,20 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             return None
         return response
     
+    async def get_comic_char_by_id(self, comicvine_id):
+        session = http_session.get_connection()
+        params = {
+            'api_key': COMICVINE_API_KEY,
+            'format': 'json',
+            'filter': f'id:{comicvine_id}',
+            'field_list': 'name,real_name,image'
+        }
+        async with session.get(COMICVINE_URL + "characters", params=params) as resp:
+            response = await resp.json()
+        if response['error'] != "OK":
+            return None
+        return response
+    
     async def get_mal_waifu_pics(self, mal_id):
         session = http_session.get_connection()
         async with session.get(
@@ -560,12 +574,21 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         if waifu is None:
             await ctx.send(f"No waifu with id {list_id}.")
             return
-        waifu_data = await self.get_waifu_by_id(waifu.mal_id)
-        desc = "More info soon"
-        embed = discord.Embed(title=waifu.name, description=desc, color=0x200FB4)
-        embed._image = {
-            'url': waifu_data['image_url']
-        }
+        if waifu.is_comicvine:
+            response = await self.get_comic_char_by_id(waifu.mal_id)
+            waifu_data = response['results'][0]
+            desc = "More info soon"
+            embed = discord.Embed(title=waifu.name, description=desc, color=0x200FB4)
+            embed._image = {
+                'url': waifu_data['image']['medium_url']
+            }
+        else:
+            waifu_data = await self.get_waifu_by_id(waifu.mal_id)
+            desc = "More info soon"
+            embed = discord.Embed(title=waifu.name, description=desc, color=0x200FB4)
+            embed._image = {
+                'url': waifu_data['image_url']
+            }
         await ctx.send(embed=embed)
     
     @command()
