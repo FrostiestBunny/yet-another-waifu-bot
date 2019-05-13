@@ -3,6 +3,7 @@ from discord.ext.commands import command, Context, group, Cog
 import asyncio
 import random
 from waifu_manager import waifu_manager
+from player import players
 from http_session import http_session
 import itertools
 from difflib import SequenceMatcher
@@ -10,6 +11,7 @@ from timers import timers
 import os
 import unicodedata
 import github_api
+import datetime
 
 from my_bot import MyBot
 
@@ -831,6 +833,33 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             return
         await waifu_manager.set_waifu_as_favorite(str(author.id), list_id, emoji_code)
         await ctx.send(f"Set {waifu.name} as favorite under {emoji} emoji.")
+    
+    def is_after(self, new_time):
+        now = datetime.datetime.now(tz=new_time.tzinfo)
+        print(now)
+        print(new_time)
+        return now >= new_time
+
+    async def check_gacha_time(self, player):
+        new_time = player.new_gacha_time
+        if new_time is None:
+            players.update_gacha_time(player)
+            return True
+        if self.is_after(new_time):
+            players.update_gacha_time(player)
+            return True
+        return False
+    
+    @command()
+    async def dailygacha(self, ctx: Context):
+        author = ctx.message.author
+        player = waifu_manager.get_player(author.id)
+        if await self.check_gacha_time(player):
+            await ctx.send("You'd get a new waifu now if this worked")
+            await ctx.send(f"For Zack, don't mind this\n{player.new_gacha_time}")
+        else:
+            await ctx.send("You wouldn't get a waifu now if this worked")
+            await ctx.send(f"For Zack, don't mind this\n{player.new_gacha_time}")
 
 
 class WaifuTrade:

@@ -209,6 +209,9 @@ class WaifuManager:
         player = self.players.players[discord_id]
         return player.gist_id
     
+    def get_player(self, discord_id):
+        return self.players.players.get(str(discord_id))
+    
     def update_player_gist(self, discord_id, gist_id):
         self.players.update_player_gist_id(discord_id, gist_id)
 
