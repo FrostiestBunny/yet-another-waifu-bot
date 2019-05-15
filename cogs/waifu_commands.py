@@ -905,11 +905,10 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             }
             await ctx.send(embed=embed)
         else:
-            await ctx.send("You've already used your daily draw.")
             remaining = self.check_remaining_time(player.new_gacha_time)
             hours, minutes, seconds = self.get_hours_minutes_seconds(remaining)
             time_response = self.get_time_string(hours, minutes, seconds)
-            await ctx.send(f"Next draw in {time_response}.")
+            await ctx.send(f"You've already used your daily draw.\nNext draw in {time_response}.")
     
     @command()
     async def dailycomic(self, ctx: Context):
@@ -929,11 +928,10 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             }
             await ctx.send(embed=embed)
         else:
-            await ctx.send("You've already used your daily draw.")
             remaining = self.check_remaining_time(player.new_comic_time)
             hours, minutes, seconds = self.get_hours_minutes_seconds(remaining)
             time_response = self.get_time_string(hours, minutes, seconds)
-            await ctx.send(f"Next draw in {time_response}.")
+            await ctx.send(f"You've already used your daily draw.\nNext draw in {time_response}.")
 
 
 class WaifuTrade:
