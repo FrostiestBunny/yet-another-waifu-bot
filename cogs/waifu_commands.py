@@ -309,7 +309,6 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         await ctx.send(embed=embed)
 
     async def random_waifu(self, channel):
-        DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
 
         if random.randint(0, 99) < 30:
             comicvine = True
@@ -339,11 +338,9 @@ class WaifuCommands(Cog, name="Waifu Commands"):
                         waifu_manager.prepare_comic_spawn(response)
                         return
             else:
-                char_id = random.randint(1, 99999)
-                response = await self.get_waifu_by_id(char_id)
+                response = await self.get_random_mal_waifu()
                 if response is not None:
-                    if response['image_url'] != DEFAULT_IMAGE_URL and\
-                            response['member_favorites'] >= 5:
+                    if self.is_mal_waifu_valid(response):
                         pictures = await self.get_mal_waifu_pics(response['mal_id'])
                         waifu_manager.prepare_waifu_spawn(response, pictures['pictures'])
                         return
@@ -357,6 +354,16 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         if error is not None:
             return None
         return response
+    
+    async def get_random_mal_waifu(self):
+        char_id = random.randint(1, 99999)
+        response = await self.get_waifu_by_id(char_id)
+        return response
+    
+    def is_mal_waifu_valid(self, response):
+        DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
+        return response['image_url'] != DEFAULT_IMAGE_URL and\
+            response['member_favorites'] >= 5
     
     async def get_comic_char_by_id(self, comicvine_id):
         session = http_session.get_connection()
@@ -836,9 +843,11 @@ class WaifuCommands(Cog, name="Waifu Commands"):
     
     def is_after(self, new_time):
         now = datetime.datetime.now(tz=new_time.tzinfo)
-        print(now)
-        print(new_time)
         return now >= new_time
+    
+    def check_remaining_time(self, new_time):
+        now = datetime.datetime.now(tz=new_time.tzinfo)
+        return new_time - now
 
     async def check_gacha_time(self, player):
         new_time = player.new_gacha_time
@@ -850,16 +859,44 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             return True
         return False
     
+    def get_hours_minutes_seconds(self, timedelta: datetime.timedelta):
+        total_s = timedelta.total_seconds()
+        hours = int(total_s // 3600)
+        minutes = int((total_s % 3600) // 60)
+        seconds = int((total_s % 3600) % 60)
+        return hours, minutes, seconds
+    
+    def get_time_string(self, hours, minutes, seconds):
+        result = ""
+        if hours > 0:
+            result += f"{hours} hours, "
+        if minutes > 0:
+            result += f"{minutes} minutes, and "
+        result += f"{seconds} seconds"
+        return result
+    
     @command()
     async def dailygacha(self, ctx: Context):
         author = ctx.message.author
         player = waifu_manager.get_player(author.id)
         if await self.check_gacha_time(player):
-            await ctx.send("You'd get a new waifu now if this worked")
-            await ctx.send(f"For Zack, don't mind this\n{player.new_gacha_time}")
+            response = await self.get_random_mal_waifu()
+            while response is None or not self.is_mal_waifu_valid(response):
+                response = await self.get_random_mal_waifu()
+            waifu_manager.add_waifu_to_player(str(response['mal_id']),
+                                              response['name'], False, str(author.id))
+            desc = f"Draw result:\n**{response['name']}**"
+            embed = discord.Embed(title="Daily Gacha", description=desc, color=0x07FAA2)
+            embed._image = {
+                'url': str(response['image_url'])
+            }
+            await ctx.send(embed=embed)
         else:
-            await ctx.send("You wouldn't get a waifu now if this worked")
-            await ctx.send(f"For Zack, don't mind this\n{player.new_gacha_time}")
+            await ctx.send("You've already used your daily draw.")
+            remaining = self.check_remaining_time(player.new_gacha_time)
+            hours, minutes, seconds = self.get_hours_minutes_seconds(remaining)
+            time_response = self.get_time_string(hours, minutes, seconds)
+            await ctx.send(f"Next draw in {time_response}.")
 
 
 class WaifuTrade:
