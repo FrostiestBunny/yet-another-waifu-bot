@@ -14,12 +14,12 @@ class Players:
         self.load_players()
 
     def load_players(self):
-        self.cur.execute("SELECT id, currency, won_fights, lost_fights, gist_id, new_gacha FROM players;")
+        self.cur.execute("SELECT id, currency, won_fights, lost_fights, gist_id, new_gacha, new_comic FROM players;")
         query = self.cur.fetchall()
         for row in query:
-            _id, currency, won_fights, lost_fights, gist_id, new_gacha = row
+            _id, currency, won_fights, lost_fights, gist_id, new_gacha, new_comic = row
             self.players[str(_id)] = Player(str(_id), int(won_fights),
-                                            int(lost_fights), int(currency), gist_id, new_gacha)
+                                            int(lost_fights), int(currency), gist_id, new_gacha, new_comic)
 
     def add_player(self, _id, username):
         _id = str(_id)
@@ -62,6 +62,19 @@ class Players:
         self.cur.execute("UPDATE players SET new_gacha=%s WHERE id=%s;", (new_time, player._id))
         self.save()
         player.new_gacha_time = new_time
+    
+    def update_comic_gacha_time(self, player):
+        self.cur.execute("SELECT now FROM now();")
+        query = self.cur.fetchone()
+        current_time = query[0]
+        if current_time.hour < 6:
+            new_time = current_time.replace(hour=6, minute=0, second=0)
+        else:
+            new_time = current_time + datetime.timedelta(days=1)
+            new_time = new_time.replace(hour=6, minute=0, second=0)
+        self.cur.execute("UPDATE players SET new_comic=%s WHERE id=%s;", (new_time, player._id))
+        self.save()
+        player.new_comic_time = new_time
 
     def save(self):
         self.conn.commit()
@@ -69,13 +82,15 @@ class Players:
 
 class Player:
 
-    def __init__(self, _id, won_fights=0, lost_fights=0, currency=0, gist_id=None, new_gacha_time=None):
+    def __init__(self, _id, won_fights=0, lost_fights=0, currency=0,
+                 gist_id=None, new_gacha_time=None, new_comic_time=None):
         self._id = _id
         self.won_fights = won_fights
         self.lost_fights = lost_fights
         self.currency = currency
         self.gist_id = gist_id
         self.new_gacha_time = new_gacha_time
+        self.new_comic_time = new_comic_time
         self.waifu_list = None
 
     def set_waifu_list(self, waifu_list):

@@ -334,7 +334,7 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             if comicvine:
                 response = await self.get_random_comic_char()
                 if response is not None:
-                    if not response['results'][0]['image']['medium_url'].endswith('blank.png'):
+                    if self.is_comic_waifu_valid(response):
                         waifu_manager.prepare_comic_spawn(response)
                         return
             else:
@@ -364,6 +364,9 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         DEFAULT_IMAGE_URL = "https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png"
         return response['image_url'] != DEFAULT_IMAGE_URL and\
             response['member_favorites'] >= 5
+    
+    def is_comic_waifu_valid(self, response):
+        return not response['results'][0]['image']['medium_url'].endswith('blank.png')
     
     async def get_comic_char_by_id(self, comicvine_id):
         session = http_session.get_connection()
@@ -859,6 +862,16 @@ class WaifuCommands(Cog, name="Waifu Commands"):
             return True
         return False
     
+    async def check_comic_gacha_time(self, player):
+        new_time = player.new_comic_time
+        if new_time is None:
+            players.update_comic_gacha_time(player)
+            return True
+        if self.is_after(new_time):
+            players.update_comic_gacha_time(player)
+            return True
+        return False
+    
     def get_hours_minutes_seconds(self, timedelta: datetime.timedelta):
         total_s = timedelta.total_seconds()
         hours = int(total_s // 3600)
@@ -894,6 +907,30 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         else:
             await ctx.send("You've already used your daily draw.")
             remaining = self.check_remaining_time(player.new_gacha_time)
+            hours, minutes, seconds = self.get_hours_minutes_seconds(remaining)
+            time_response = self.get_time_string(hours, minutes, seconds)
+            await ctx.send(f"Next draw in {time_response}.")
+    
+    @command()
+    async def dailycomic(self, ctx: Context):
+        author = ctx.message.author
+        player = waifu_manager.get_player(author.id)
+        if await self.check_comic_gacha_time(player):
+            response = await self.get_random_comic_char()
+            while response is None or not self.is_comic_waifu_valid(response):
+                response = await self.get_random_comic_char()
+            response = response['results'][0]
+            waifu_manager.add_waifu_to_player(str(response['id']),
+                                              response['name'], True, str(author.id))
+            desc = f"Draw result:\n**{response['name']}**"
+            embed = discord.Embed(title="Daily Comic Gacha", description=desc, color=0x07FAA2)
+            embed._image = {
+                'url': str(response['image']['medium_url'])
+            }
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("You've already used your daily draw.")
+            remaining = self.check_remaining_time(player.new_comic_time)
             hours, minutes, seconds = self.get_hours_minutes_seconds(remaining)
             time_response = self.get_time_string(hours, minutes, seconds)
             await ctx.send(f"Next draw in {time_response}.")
