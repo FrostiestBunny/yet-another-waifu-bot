@@ -350,7 +350,10 @@ class WaifuCommands(Cog, name="Waifu Commands"):
         session = http_session.get_connection()
         async with session.get(API_URL + "character/{}".format(mal_id)) as resp:
             response = await resp.json()
-        error = response.get('error', None)
+        try:
+            error = response.get('error', None)
+        except AttributeError:
+            return None
         if error is not None:
             return None
         return response
