@@ -1,24 +1,19 @@
-import re
-
-
 class DateBuilder:
 
     def __init__(self, filename):
+        self.current_date = None
         self.dates = {}
     
-    def start_build(self, date_name, date_text):
-        date = Date()
-        date.main_text = date_text
-        self.dates[date_name] = date
-        self.extract_choices(date)
+    def start_build(self, date_name):
+        self.current_date = Date()
+        self.dates[date_name] = self.current_date
     
-    def extract_choices(self, date):
-        text = date.main_text
-        exp = re.compile(r'\[.*?\]')
-        choices_text = re.findall(exp, text)
-        for text in choices_text:
-            date.add_choice(Choice(text))
+    def add_text(self, text):
+        self.current_date.main_text += text
     
+    def add_choice(self, choice):
+        self.current_date.choices.append(choice)
+
     def get_date(self, date_name):
         return self.dates[date_name]
 
@@ -26,17 +21,25 @@ class DateBuilder:
 class Date:
 
     def __init__(self):
-        self.main_text = None
+        self.main_text = ""
         self.choices = []
-    
-    def add_choice(self, choice):
-        self.choices.append(choice)
 
 
 class Choice:
 
-    def __init__(self, text):
-        self.build_choice(text)
+    def __init__(self):
+        self.prompts = None
+        self.options = {}
+        self.outcomes = {}
     
-    def build_choice(self, text):
-        pass
+    def add_prompt(self, prompt):
+        self.prompt = prompt
+    
+    def add_option(self, name, text):
+        self.options[name] = text
+    
+    def add_outcome(self, option_name, text):
+        self.outcomes[option_name] = text
+    
+    def get_outcome(self, option_name):
+        return self.outcomes[option_name]
