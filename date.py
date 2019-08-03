@@ -28,7 +28,7 @@ class Date:
 class Choice:
 
     def __init__(self):
-        self.prompts = None
+        self.prompt = None
         self.options = {}
         self.outcomes = {}
     
@@ -40,6 +40,12 @@ class Choice:
     
     def add_outcome(self, option_name, text):
         self.outcomes[option_name] = text
+    
+    def get_prompt(self):
+        return self.prompt
+    
+    def get_options(self):
+        return self.options
     
     def get_outcome(self, option_name):
         return self.outcomes[option_name]
